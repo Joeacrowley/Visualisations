@@ -1,0 +1,28 @@
+project:
+  type: book
+
+book:
+  title: "Visualisations in R"
+  author: "JC"
+  chapters:
+    - index.qmd
+    - part: "Some old notes"
+      chapters:
+        - 1_ggplot_basics.qmd
+        - 2_colours.qmd
+        - 3_ggplot_themes.qmd
+        - 4_bar_charts.qmd
+    - part: "Colour"
+      chapters:
+        - 5_colours.qmd
+    - part: "Some simple functions"
+      chapters:
+        - 6_Bar_chart_function.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 4
+    page-layout: full
+    css: dense-notes.css

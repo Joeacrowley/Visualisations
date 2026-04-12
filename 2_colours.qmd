@@ -1,0 +1,816 @@
+---
+title: "ggplot colours"
+format: html
+editor: visual
+---
+
+<br>
+
+## Standard ggplot2 colours   
+
+The standard ggplot2 colours are pretty nice. To understand these see [The default colours of ggplot2](https://www.statology.org/ggplot-default-colors/). 
+
+To view the basic colours in a chart...  
+
+```{r, message=FALSE, warning=FALSE, collapse=FALSE}
+library(tidyverse)
+library(ggpubr)
+
+#create data frame
+df <- data.frame(team=c('A', 'B', 'C'),
+                 points=c(22, 28, 15))
+
+#create bar plot using df
+ggplot(df, aes(x=team, y=points, fill=team)) +
+  geom_bar(stat = "identity")
+
+```
+
+<br>
+
+To obtain the hex codes of these colours we can use the hue_pal function...  
+
+```{r, message=FALSE, collapse=TRUE}
+library(scales)
+
+#extract hex color codes for a plot with three elements in ggplot2 
+hex <- hue_pal()(3)
+
+#display hex color codes
+hex
+
+show_col(hex)
+```
+
+<br>
+
+To see the colours ggplot2 will use as standard with different numbers of groups... 
+
+```{r}
+
+#set margins of plot area
+par(mai = c(0.1, 0, 0.1, 0), bg = "grey85")
+
+#create plot with ggplot2 default colors from 1 to 8
+gc.grid <- layout(matrix(1:8, nrow = 8))
+for(i in 1:8){
+   gc.ramp <- hue_pal()(i)
+   plot(c(0, 8), c(0,1),
+        type = "n", 
+        bty="n", 
+        xaxt="n", 
+        yaxt="n", xlab="", ylab="")
+   for(j in 1:i){
+      rect(j - 1, 0, j - 0.25, 1, col = gc.ramp[j])
+   }
+}
+
+```
+
+<br> 
+
+We can the also return the hex codes associated with them. 
+
+```{r}
+
+#display ggplot2 default hex color codes from 1 to 8
+for(i in 1:8){
+  print(hue_pal()(i))
+}
+
+```
+
+<br>
+
+## Other standard colour scales
+
+See source here - the [https://ggplot2-book.org/scales-colour](ggplot2 book).
+
+<br>
+
+### Continuous scales  
+
+Colour gradients.. here illustrated with a 2d density estimate of the faithful dataset (Azzalini and Bowman 1990), which records the waiting time between eruptions and during each eruption for the Old Faithful geyser in Yellowstone Park. 
+
+*  eruptions	numeric	Eruption time in mins.     
+*	 waiting	numeric	Waiting time to next eruption (in mins).   
+*  density 2d density estimate.    
+ 
+We hide the legends and set expand to 0, to focus on the appearance of the data.  
+
+Remember: although we use the erupt plot to illustrate concepts using with a fill aesthetic, the same ideas apply to colour scales. Any time we refer to scale_fill_*() in this section there is a corresponding scale_colour_*() for the colour aesthetic.  
+
+```{r}
+
+erupt <- ggplot(faithfuld, aes(waiting, eruptions, fill = density)) +
+  geom_raster() +
+  scale_x_continuous(NULL, expand = c(0, 0)) + 
+  scale_y_continuous(NULL, expand = c(0, 0)) + 
+  theme(legend.position = "none")
+
+erupt
+
+# scale_fill_gradient - produces a two-colour gradient
+eruptb <- erupt + scale_fill_gradient(low = "#ff8200", high = "#7082d4")
+
+# scale_fill_gradient2() produces a three-colour gradient with specified midpoint
+eruptc <- erupt + scale_fill_gradient2(low = "#f25c91", mid = "white", high = "#00ab85", midpoint = mean(faithfuld$density))
+
+# scale_fill_gradientn() produces an n-colour gradient
+# Not sure of the use of this... 
+
+ggarrange(erupt,
+          eruptb,
+          eruptc,
+          labels = c("A", "B", "C"),
+          ncol = 2, nrow = 2)
+
+```
+
+#### Missing data in continuous scales
+
+```{r}
+
+df <- data.frame(x = 1, y = 1:5, z = c(1, 3, 2, NA, 5))
+base <- ggplot(df, aes(x, y)) + 
+  geom_tile(aes(fill = z), linewidth = 5) + 
+  labs(x = NULL, y = NULL) +
+  scale_x_continuous(labels = NULL)
+
+ggarrange(base,
+          base + scale_fill_gradient(na.value = NA),
+          base + scale_fill_gradient(na.value = "yellow"),
+          labels = c("A", "B", "C"),
+          ncol = 2, nrow = 2)
+
+```
+
+<br>
+
+#### Limits, breaks, and labels
+
+```{r}
+base <- ggplot(mpg, aes(cyl, displ, colour = hwy)) +
+  geom_point(size = 2)
+
+ggarrange(
+  base,
+  base + scale_color_gradient(limits = c(0, 100)),
+  base + scale_color_gradient(breaks = c(10, 15, 20,25,30,35,40)),
+  labels = c("A", "B", "C"),
+  ncol = 2, nrow = 2)
+
+
+```
+
+
+#### Legends in continuous scales
+
+```{r}
+
+basea <- base + guides(colour = guide_colourbar(reverse = TRUE))
+baseb <- base + guides(colour = guide_colourbar(barheight = unit(2, "cm")))
+basec <- base + guides(colour = guide_colourbar(direction = "horizontal"))
+
+ggarrange(
+  basea, baseb, basec,
+  labels = c("A", "B", "C"),
+  ncol = 2, nrow = 2)
+
+```
+
+<br>
+
+#### What is a good colour scale for continous data? 
+
+My preference for most charts is one colour from opaque to low opacity. As shown below, when you run from one colour to another the results are often hard to follow. The exception perhaps are maps, where a third middle colour, that can be white, works quite well. This does not work for something like a dot plot. 
+
+```{r}
+
+base <- ggplot(mpg, aes(cyl, displ, colour = hwy)) +
+  geom_point(size = 2) 
+
+basea <- base + scale_color_gradient(low = "#ccede8",high = "#00ab85")
+baseb <- base + scale_color_gradient(low = "#f25c91",high = "#7082d4")
+basec <- base + scale_color_gradient(low = "#F8766D",high = "#619CFF")
+based <- base + scale_color_gradient2(low = "#F8766D",high = "#00BFC4", mid = "white", 
+                                     midpoint = median(mpg$hwy))
+
+ggarrange(
+  basea, baseb, basec,based,
+  labels = c("A", "B", "C","D"),
+  ncol = 2, nrow = 2)
+
+```
+
+<br>
+
+#### Colour Brewer scales
+
+Or Colour Brewer has a set of sequential scales to choose from. 
+
+
+```{r}
+
+RColorBrewer::display.brewer.all(type = "seq")
+
+```
+
+<br>
+
+Of the below I like YlGn and OrRd.
+
+Note use of scale_colour_distiller for distilling a categorised fill colour from a continuous variable. 
+
+```{r}
+
+basea <- base + scale_colour_distiller(palette = "Blues")
+baseb <- base + scale_colour_distiller(palette = "YlGn")
+basec <- base + scale_colour_distiller(palette = "OrRd")
+based <- base + scale_colour_distiller(palette = "BuGn")
+
+ggarrange(
+  basea, baseb, basec,based,
+  labels = c("A", "B", "C","D"),
+  ncol = 2, nrow = 2)
+
+```
+
+<br><br>
+
+### Categorical colours
+
+```{r}
+
+penguin <- palmerpenguins::penguins 
+
+library(gtsummary)
+penguin %>% tbl_summary(label = list(
+  species ~ "Penguin species", 
+  island ~ "Island in Palmer Archipelago", 
+  bill_length_mm ~ "Bill length (millimeters)", 
+  bill_depth_mm ~ "Bill depth (millimeters)",
+  flipper_length_mm ~ "Flipper length (millimeters)",
+  body_mass_g ~ "Body mass (grams)",
+  sex ~ "Penguin sex",
+  year ~ "Study year"), 
+  missing_text = "Missing", 
+  statistic = list(all_continuous() ~ "{mean}"))
+
+```
+
+<br>
+
+For up to 3 colours I think basic ggplot does a great job. 
+
+```{r}
+
+species <- penguin %>% group_by(species) %>% summarise(n = n()) %>% 
+  mutate(species_percent = 100 * (n/ sum(n)))
+
+year <- penguin %>% group_by(year) %>% summarise(n = n()) %>% 
+  mutate(year_percent = 100 * (n/ sum(n)))
+
+sex <- penguin %>% group_by(sex) %>% summarise(n = n()) %>% 
+  mutate(sex_percent = 100 * (n/ sum(n)))
+
+island <- penguin %>% group_by(island) %>% summarise(n = n()) %>% 
+  mutate(island_percent = 100 * (n/ sum(n)))
+
+bar1 <- species %>% ggplot(aes(x = species, y = species_percent, fill = species)) + 
+  geom_col()
+
+bar2 <- sex %>% ggplot(aes(x = sex, y = sex_percent, fill = sex)) + 
+  geom_col()
+
+bar3 <- island %>% ggplot(aes(x = island, y = island_percent)) + 
+  geom_col()
+
+bar4 <- year %>% ggplot(aes(x = year, y = year_percent)) + 
+  geom_col(fill = "#00BFC4")
+
+ggarrange(
+  bar1, bar2, bar3, bar4,
+  labels = c("A", "B", "C", "D"),
+  ncol = 2, nrow = 2)
+
+```
+
+<br>
+
+Once you get beyond three, however, I think further colours are required. 
+
+```{r}
+
+penguin <- penguin %>% mutate(
+  sex_island = paste0(island, ": ", sex)
+)
+
+penguin %>% count(sex_island)
+
+bar5 <- penguin %>% count(sex_island) %>% 
+  ggplot(aes(x = sex_island, y = n, fill = sex_island)) + 
+  geom_col() + 
+  coord_flip()
+
+bar5
+```
+
+<br> 
+
+The ggplot standard above is actually not bad. 
+
+Alternatively, Colour Brewer provides a set of categorical data colour scales. 
+
+Note that there length differs in if there are not enough of them then those categories are missing. 
+
+```{r}
+RColorBrewer::display.brewer.all(type = "qual")
+```
+
+<br>
+
+The ggplot2 book's recommended options for areas are below, with the addition of Set1 which I like:   
+
+* Pastel1    
+* Pastel2  
+* Set2  
+* Accent  
+
+Whereas for points it suggests Set1 and Dark2.  
+
+```{r, fig.height=15}
+
+library(RColorBrewer )
+qual_palettes <- brewer.pal.info[brewer.pal.info$category == "qual", ]
+print(qual_palettes)
+
+ggarrange(
+  bar5 + scale_fill_brewer(palette = "Set1"),
+  bar5 + scale_fill_brewer(palette = "Pastel1"),
+  bar5 + scale_fill_brewer(palette = "Pastel2"),
+  bar5 + scale_fill_brewer(palette = "Set2"),
+  bar5 + scale_fill_brewer(palette = "Accent"),
+  labels = c("A", "B", "C", "D", "E"),
+  ncol = 1, nrow = 5)
+
+```
+
+<br>
+
+A last one from paletteer. Only has up to 5 colours. The Van Gogh palette. Not sure what I'd use it for. 
+
+```{r}
+
+bar1 + paletteer::scale_fill_paletteer_d("rtist::vangogh")
+
+```
+
+
+<br>
+
+Alternatively with a NatCen colour palette.  
+
+* The first option uses the second most opaque NatCen colours.   
+* The second uses the most opaque and the fourth most opaque set of colours.  * The third options is the first, third and least most opaque colours.  
+* The final one is the most opaque and the least. 
+
+
+```{r}
+
+# For less than 5...
+bar1 + scale_fill_manual(values = c("#8f99de","#f57da8","#33bd9e","#bf75b5","#ff9c33"))
+
+# For UP TO 10...
+bar5 + scale_fill_manual(values = c("#7082d4","#c7cced","#f25c91","#fabfd4","#00ab85","#99decf","#b053a1","#debad9","#ff8200","#ffcc99"))
+
+# In an ideal world this might need to be (as the group variable has three levels): 
+bar5 + 
+  geom_col(color = "black") + 
+  scale_fill_manual(values = c("#7082d4","#abb5e5","#e3e5f5",
+                               "#f25c91","#f79ebf","#fcdee8",
+                               "#00ab85","#66ccb5","#ccede8",
+                               "#b053a1","#d199c7","#f0deed",
+                               "#ff8200","#ffb566","#ffe5cc")) 
+
+# Whereas with two levels it could look like this: 
+penguin %>% 
+  filter(!grepl(": NA", sex_island)) %>%
+  count(sex_island) %>%
+  ggplot(aes(x = sex_island, y = n, fill = sex_island)) + 
+  geom_col() + 
+  coord_flip() + 
+  scale_fill_manual(values = c("#7082d4","#c7cced","#f25c91","#fabfd4","#00ab85","#99decf","#b053a1","#debad9","#ff8200","#ffcc99"))
+
+```
+
+<br>
+
+#### Fill colour for points points
+
+```{r}
+# scatter plot
+df <- data.frame(
+  x = 1:3 + runif(30), 
+  y = runif(30), 
+  z = c("a", "b", "c")
+)
+point <- ggplot(df, aes(x, y)) +
+  geom_point(aes(colour = z))  + 
+  theme(legend.position = "none") +
+  labs(x = NULL, y = NULL)
+
+# three palettes
+point # Basic one is quite nice here with limited set of data
+point + scale_colour_brewer(palette = "Set1")
+point + scale_colour_brewer(palette = "Dark2")  
+
+```
+
+<br><br>
+
+## A how to guide on defining palettes    
+
+The below is taken from R for the rest of us.  
+
+Their first step is to define a list of colours as objects.  
+
+```{r}
+
+# Define Colors -----------------------------------------------------------
+
+ga_purple <- "#8359AB"
+ga_yellow <- "#FFDE39"
+ga_gray <- "#827C78"
+ga_blue <- "#49B8F1"
+ga_brown <- "#B88262"
+ga_pink <- "#DC458E"
+
+```
+
+<br>
+
+They then put these in a function, so that these values are passed to the function scale_colour_manual each time it is run.   
+
+This first one is for categorical variables where the ordering of the colours is not meaningful.   
+
+```{r, collapse=TRUE}
+
+# Qualitative -------------------------------------------------------------
+
+scale_color_ga_qualitative <- function() {
+  
+  scale_color_manual(values = c(ga_blue, 
+                                ga_pink, 
+                                ga_yellow, 
+                                ga_purple, 
+                                ga_gray, 
+                                ga_brown))
+  
+}
+
+palmerpenguins::penguins %>%
+  ggplot() +
+  geom_point(aes(x = bill_length_mm, 
+                 y = flipper_length_mm,
+                 color = island)) +
+  labs(title = "Palmer Penguins", 
+       subtitle = "Look at them go!",
+       x = "Bill length",
+       y = "Flipper length") +
+  theme_minimal() +
+  scale_color_ga_qualitative()
+
+```
+
+<br>
+
+Before the next example they load some interesting looking data about the 2020 US Presidential Election. They also load shapefiles from the `tigris` package for US Counties, so these results can be mapped onto a US electoral map. 
+
+```{r, collapse=TRUE}
+# Download Data -----------------------------------------------------------
+
+library(tigris)
+
+# Downloaded from https://github.com/tonmcg/US_County_Level_Election_Results_08-20
+presidential_returns_by_county <- read_csv("https://github.com/tonmcg/US_County_Level_Election_Results_08-20/raw/master/2020_US_County_Level_Presidential_Results.csv")
+
+```
+
+```{r, results='hide'}
+# Done with tigris package
+us_counties <- counties()
+```
+
+```{r, collapse=TRUE}
+
+# Merge datasets
+nc_presidential_returns_by_county <- us_counties %>% 
+  left_join(presidential_returns_by_county,
+            by = c("GEOID" = "county_fips")) %>% 
+  filter(state_name == "North Carolina") %>% 
+  mutate(county_name = str_remove(county_name, " County")) %>% 
+  select(county_name, contains("votes"), per_point_diff) 
+
+```
+
+<br>
+
+Next they do a sequential scale. Again, a function is defined where the progression of colour matters, setting this through the *low* and *high* arguments of the `scale_fill_gradient` function. 
+
+```{r}
+# Sequential --------------------------------------------------------------
+
+scale_fill_ga_sequential <- function(low_color = ga_yellow, 
+                                     high_color = ga_purple) {
+  
+  scale_fill_gradient(low = low_color, 
+                      high = high_color)
+  
+}
+
+nc_presidential_returns_by_county %>% 
+  ggplot(aes(fill = total_votes)) +
+  geom_sf() +
+  theme_void() +
+  scale_fill_ga_sequential()
+
+nc_presidential_returns_by_county %>% 
+  ggplot(aes(fill = total_votes)) +
+  geom_sf() +
+  theme_void() +
+  scale_fill_ga_sequential(low_color = ga_purple,
+                           high_color = ga_yellow)
+
+```
+
+<br>
+
+To obtain diverging scale colours the `scale_fill_gradient2` function allows a middle colour to be set.  
+
+```{r}
+# Diverging ---------------------------------------------------------------
+
+scale_fill_ga_diverging <- function(low_color = ga_yellow, 
+                                    medium_color = "white",
+                                    high_color = ga_pink) {
+  
+  scale_fill_gradient2(low = low_color, 
+                       mid = medium_color,
+                       high = high_color)
+  
+}
+
+nc_presidential_returns_by_county %>% 
+  ggplot(aes(fill = per_point_diff)) +
+  geom_sf() +
+  theme_void() +
+  scale_fill_ga_diverging()
+
+```
+
+<br>
+
+## Defining my own palettes  
+
+The below is simply the salmon and cyan colours from the ggplot2 standard palette. They don't work great as sequential colours.     
+
+```{r}
+
+ggplot_salmon <- "#F8766D"
+ggplot_cyan <- "#00BFC4"
+
+scale_fill_ga_diverging <- function(low_color = ggplot_salmon, 
+                                    medium_color = "white",
+                                    high_color = ggplot_cyan) {
+  
+  scale_fill_gradient2(low = low_color, 
+                       mid = medium_color,
+                       high = high_color)
+  
+}
+
+nc_presidential_returns_by_county %>% 
+  ggplot(aes(fill = per_point_diff)) +
+  geom_sf() +
+  theme_void() +
+  scale_fill_ga_diverging()
+
+scale_fill_ga_sequential <- function(low_color = ggplot_salmon, 
+                                     high_color = ggplot_cyan) {
+  
+  scale_fill_gradient(low = low_color, 
+                      high = high_color)
+  
+}
+
+
+nc_presidential_returns_by_county %>% 
+  ggplot(aes(fill = per_point_diff)) +
+  geom_sf() +
+  theme_void() +
+  scale_fill_ga_sequential()
+
+```
+
+<br><br>
+
+## Choosing my own colours   
+
+Is hard.  
+
+The below are a pastel ish set of colours.  
+
+```{r}
+mp <- 
+  c("#FFACC2","#FAD0DA","#9EDFEA","#90E3DE","#FF9D93","#FFB5A6", 
+ "#FFD3D4", "#FFE9E9", "#C1DCD9", "#BDECE9", "#CBDFF3", "#ACC7E9", "#86ADDC", "#FED8CF", 
+  "#FFC6BF", "#CBEFE0", "#B0EFC8", "#A6D8C7", "#8AC3A6", "#96DBF2", "#8DE8F8",
+ "#FFBD81", "#FFC59D", "#FFCBB3", "#F08DFE", "#ECD7F5", "#FADAD4", "#EFBCB3", "#DCEBF2")
+show_col(mp, cex_label = 0.8)
+```
+
+<br>
+
+```{r, collapse=TRUE}
+data(mpg)
+head(mpg)
+```
+
+<br>
+
+```{r, collapse=TRUE}
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, linetype = drv, colour=drv)) + 
+  geom_smooth() + 
+  geom_point() + 
+  scale_color_manual(values = mp)
+
+```
+
+<br>
+
+### A trial set of categorical colours   
+
+Hideous.  
+
+```{r, collapse=TRUE}
+
+cp <- c("#86ADDC","#F08DFE","#FF9D93","#8AC3A6")
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, linetype = drv, colour=drv)) + 
+  geom_smooth() + 
+  geom_point() + 
+  scale_color_manual(values = cp)
+  
+```
+
+<br>
+
+### A marshmallow (?) theme   
+
+```{r}
+marshmallow <- 
+  c("#FAC8D2", "#F69FAF", "#B66899", "#FFA289", "#F5C085", "#FEC058", 
+    "#DC9793", "#DE7970", "#E2754C", "#D4BD57", "#C26E1D", "#DF994C",
+    "#FBB25C", "#8CA19B", "#B1DEDC", "#70DBC7", "#3A989E", "#5E84A2",
+    "#51694D", "#598263", "#83DD9D", "#ABDC9D", "#C8DD82", "#DCD55C", 
+    "#D1F2E0", "#BBF2BD", "#8DBD8F", "#5A925B")
+
+show_col(marshmallow, cex_label = 0.8)
+```
+
+<br>
+
+Still fairly hideous. 
+
+```{r, collapse=TRUE}
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, linetype = drv, colour=drv)) + 
+  geom_smooth() + 
+  geom_point() + 
+  scale_color_manual(values = marshmallow[c(3,16,13)])
+
+```
+
+<br><br>
+
+## The NatCen colours  
+
+They have potential, and useful for work.  
+
+In a colour wheel these colours are closest to opposites:  
+
+* mint green and pink,   
+* blue and orange,     
+* purple is a bit out on its own, it might work opposite mint green as well.  
+
+```{r}
+nc_pink <- "#f25c91"
+nc_purple <- "#b053a1"
+nc_blue <- "#7082d4"
+nc_mint <- "#00ab85"
+nc_orange <- "#ff8200"
+
+scale_fill_ga_sequential <- function(low_color = nc_pink, 
+                                     high_color = nc_mint) {
+  
+  scale_fill_gradient(low = low_color, 
+                      high = high_color)
+  
+}
+
+nc_presidential_returns_by_county %>% 
+  ggplot(aes(fill = per_point_diff)) +
+  geom_sf() +
+  theme_void() +
+  scale_fill_ga_sequential()
+
+scale_fill_ga_diverging <- function(low_color = nc_pink, 
+                                    medium_color = "white",
+                                    high_color = nc_mint) {
+  
+  scale_fill_gradient2(low = low_color, 
+                       mid = medium_color,
+                       high = high_color)
+  
+}
+
+nc_presidential_returns_by_county %>% 
+  ggplot(aes(fill = per_point_diff)) +
+  geom_sf() +
+  theme_void() +
+  scale_fill_ga_diverging()
+
+```
+
+<br>
+
+### The full palette  
+
+```{r}
+
+nc_colours <- data.frame(
+  blue =   c("#7082d4", "#8f99de", "#abb5e5", "#c7cced", "#e3e5f5"), 
+  pink =   c("#f25c91", "#f57da8", "#f79ebf", "#fabfd4", "#fcdee8"),
+  mint =   c("#00ab85", "#33bd9e", "#66ccb5", "#99decf", "#ccede8"), 
+  purple = c("#b053a1", "#bf75b5", "#d199c7", "#debad9", "#f0deed"), 
+  orange = c("#ff8200", "#ff9c33", "#ffb566", "#ffcc99", "#ffe5cc")) 
+
+nc_colours[,1] # extract a column
+as.character(as.vector(nc_colours[1,])) # extract a row
+
+nc_colours %>%
+  as_vector() %>% 
+  show_col(ncol=5)
+
+```
+
+<br>
+
+```{r, collapse=TRUE}
+
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, linetype = drv, colour=drv)) + 
+  geom_smooth() + 
+  geom_point() + 
+  scale_color_manual(values = as.character(as.vector(nc_colours[2,])))
+
+```
+
+
+```{r, collapse=TRUE}
+
+scale_fill_ga_diverging <- function(low_color = nc_colours[1,5], 
+                                    medium_color = "white",
+                                    high_color = nc_colours[1,1]) {
+  
+  scale_fill_gradient2(low = low_color, 
+                       mid = medium_color,
+                       high = high_color)
+  
+}
+
+nc_presidential_returns_by_county %>% 
+  ggplot(aes(fill = per_point_diff)) +
+  geom_sf() +
+  theme_void() +
+  scale_fill_ga_diverging()
+
+```
+
+<br>
+
+## Sources  
+
+[ggplot2 themes](https://www.statology.org/best-ggplot2-themes/)   
+[Hot to make your own colour palettes in ggplot](https://rfortherestofus.com/2023/01/how-to-make-your-own-color-palettes-in-ggplot)  
+[ggplot2 colour](https://r-graph-gallery.com/ggplot2-color.html)  
+
+**Colour choice**  
+
+[How to pick more beautiful colours for your data visualisations](https://blog.datawrapper.de/beautifulcolors/#2)  
+[The Glamour of Graphics](https://rfortherestofus.com/courses/glamour/)  
+[How to make data viz that matches your organisation's branding](https://rfortherestofus.com/2022/02/data-viz-org-branding/)  
+
+
+
+

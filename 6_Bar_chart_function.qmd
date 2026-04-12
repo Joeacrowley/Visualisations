@@ -1,0 +1,500 @@
+---
+title: "Bar chart functions"
+format: html
+editor: visual
+---
+
+```{r, message=F, warning=FALSE, collapse=T}
+library(tidyverse)
+library(srvyr)
+library(flextable)
+library(haven)
+library(labelled)
+library(huxtable)
+
+# Set path to and Load data
+source("Set file paths.R")
+## Load functions
+source("/Users/joecrowley/R/Descriptives/Scripts/source_folder_r.R")
+source_folder_r("/Users/joecrowley/R/Descriptives/Scripts", verbose = T)
+```
+
+## Philosophy
+
+To arrive at a simple, usable piece of code, that is useful, as early as possible.
+
+To write generic functions - not too bespoke to a given use-case.
+
+Here, I initially wrote something tightly linked to the output format of calc_stats. It depended on column names and content more than it should have. I have now adjusted to make `bar()` more generic, taking any factor column as it's x-axis and any numeric column as the y-axis, with labels simply fed as strings.
+
+This can then be linked quite simply to the output of calc_stats, but is also useful on its own elsewhere.
+
+### Purpose
+
+Take a dataframe with one categorical (ideally factor) variable to use as the x-axis and a second numeric variable to use as the y-axis and presents this nicely in a ggplot. Add variable labels as x- and y- axis titles, and allow a user defined plot title.
+
+These plot values in a dataframe, they don't calculate new statistics from a larger dataframe.
+
+```{r}
+
+(data_frame <- calc_stats(
+  data = df2, 
+  outcome ="skipmeal2", 
+  statistics = "perc"
+))
+
+```
+
+## Functions
+
+```{r}
+# wrap_text() -----------------------------------------------------------------
+# Wraps a string to fit within a ggplot plot area.
+# plot_width: estimated plot width in inches
+# num_labels: number of bars sharing the axis — defaults to 1, which makes
+#             this suitable for titles and axis labels as well as tick labels
+# char_width: approximate width of one character in inches — adjust for font size
+# margin:     proportion of plot width to treat as unusable
+
+wrap_text <- function(text, plot_width = 7, num_labels = 1, char_width = 0.09, margin = 0.1) {
+  usable_width <- plot_width * (1 - margin)
+  max_chars    <- floor((usable_width / num_labels) / char_width)
+  str_wrap(text, width = max_chars)
+}
+
+
+# resolve_y_lab() -------------------------------------------------------------
+# Resolves y-axis label text and theme element based on label length.
+# Returns a named list: y_lab_final and y_axis_theme.
+# Short labels (<=3 chars) are horizontal, longer labels are vertical and wrapped.
+
+resolve_y_lab <- function(y_lab, plot_height = 4) {
+  if (!is.null(y_lab) && nchar(y_lab) > 3) {
+    list(
+      y_lab_final  = wrap_text(y_lab, plot_width = plot_height),
+      y_axis_theme = element_text(angle = 90, hjust = 0.5, size = 11, face = "bold")
+    )
+  } else if (!is.null(y_lab)) {
+    list(
+      y_lab_final  = y_lab,
+      y_axis_theme = element_text(angle = 0, vjust = 0.5, size = 11, face = "bold")
+    )
+  } else {
+    list(
+      y_lab_final  = NULL,
+      y_axis_theme = element_text(angle = 0, vjust = 0.5, size = 11, face = "bold")
+    )
+  }
+}
+
+
+# bar_width_from_n() ----------------------------------------------------------
+# Scales bar width to the number of x-axis labels.
+# Fewer bars get narrower widths to avoid them looking too fat.
+
+bar_width_from_n <- function(num_labels) {
+  case_when(
+    num_labels <= 3 ~ 0.4,
+    num_labels <= 5 ~ 0.6,
+    num_labels <= 8 ~ 0.75,
+    TRUE            ~ 0.9
+  )
+}
+
+
+# bar() -----------------------------------------------------------------------
+# Bar chart for a single categorical x numeric variable.
+# x:           unquoted name of the categorical column (ideally a factor) for the x-axis
+# y:           unquoted name of the numeric column for the y-axis
+# x_lab:       optional character string for the x-axis title
+# y_lab:       optional character string for the y-axis title — if longer than 3
+#              characters the label is rotated vertical and wrapped to plot height
+# title:       optional — left empty if not supplied
+# fill:        bar colour — "blue" (default), "softblue", "green", "orange"
+# plot_width:  estimated plot width in inches — used for label wrapping, default 7
+# plot_height: estimated plot height in inches — used for y-axis label wrapping
+#              when the label is long, default 4
+
+bar <- function(dat, x, y, x_lab = NULL, y_lab = NULL, title = NULL,
+                fill = "blue", plot_width = 7, plot_height = 4) {
+
+  fill_options <- c(
+    blue     = "#2E75B6",
+    softblue = "#5B9BD5",
+    green    = "#70AD47",
+    orange   = "#ED7D31"
+  )
+
+  fill <- match.arg(fill, names(fill_options))
+  fill_colour <- fill_options[[fill]]
+
+  x_var <- as.character(substitute(x))
+  y_var <- as.character(substitute(y))
+
+  x_lab_wrap <- if (!is.null(x_lab)) wrap_text(x_lab, plot_width = plot_width) else NULL
+  title_wrap <- if (!is.null(title)) wrap_text(title, plot_width = plot_width) else NULL
+
+  y_lab_resolved <- resolve_y_lab(y_lab, plot_height)
+  y_lab_final    <- y_lab_resolved$y_lab_final
+  y_axis_theme   <- y_lab_resolved$y_axis_theme
+
+  num_labels <- length(levels(fct_drop(as.factor(dat[[x_var]]))))
+  bar_width  <- bar_width_from_n(num_labels)
+
+  buffer <- mean(dat[[y_var]], na.rm = TRUE) / 4
+  ylim   <- c(0, ceiling(max(dat[[y_var]], na.rm = TRUE) + buffer))
+
+  dat %>%
+    filter(!is.na(!!sym(x_var))) %>%
+    mutate(
+      !!sym(x_var) := map_chr(
+        as.character(!!sym(x_var)),
+        wrap_text,
+        num_labels = num_labels,
+        char_width = 0.08
+      ),
+      !!sym(x_var) := factor(!!sym(x_var), levels = unique(!!sym(x_var)))
+    ) %>%
+    ggplot(aes(x = !!sym(x_var), y = !!sym(y_var))) +
+    geom_col(fill = fill_colour, width = bar_width) +
+    geom_text(aes(label = round(!!sym(y_var), 1)), vjust = -1.5, size = 11, size.unit = "pt") +
+    theme_linedraw() +
+    labs(
+      title = title_wrap,
+      x     = x_lab_wrap,
+      y     = y_lab_final
+    ) +
+    coord_cartesian(ylim = ylim) +
+    theme(
+      plot.margin  = margin(1, 1, 1, 1),
+      plot.title   = element_text(size = 13, face = "bold"),
+      axis.title   = element_text(size = 11, face = "bold"),
+      axis.title.y = y_axis_theme,
+      axis.text.x  = element_text(margin = margin(b = 10), size = 11),
+      axis.text.y  = element_text(margin = margin(l = 10), size = 11)
+    )
+
+}
+
+
+# bar_clustered() -------------------------------------------------------------
+# Clustered bar chart for a categorical x numeric variable, grouped by a third
+# factor variable displayed as fill colour.
+# x:           unquoted name of the categorical column for the x-axis
+# y:           unquoted name of the numeric column for the y-axis
+# fill:        unquoted name of the grouping variable mapped to fill colour
+# x_lab:       optional character string for the x-axis title
+# y_lab:       optional character string for the y-axis title
+# fill_lab:    optional character string for the legend title
+# title:       optional — left empty if not supplied
+# palette:     RColorBrewer palette name for fill colours, default "Set2"
+# plot_width:  estimated plot width in inches — used for label wrapping, default 7
+# plot_height: estimated plot height in inches — used for y-axis label wrapping
+#              when the label is long, default 4
+
+bar_clustered <- function(dat, x, y, fill, x_lab = NULL, y_lab = NULL,
+                          fill_lab = NULL, title = NULL,
+                          palette = c("Set2"), plot_width = 7, plot_height = 4) {
+
+  x_var    <- as.character(substitute(x))
+  y_var    <- as.character(substitute(y))
+  fill_var <- as.character(substitute(fill))
+
+  x_lab_wrap <- if (!is.null(x_lab)) wrap_text(x_lab, plot_width = plot_width) else NULL
+  title_wrap <- if (!is.null(title)) wrap_text(title, plot_width = plot_width) else NULL
+
+  y_lab_resolved <- resolve_y_lab(y_lab, plot_height)
+  y_lab_final    <- y_lab_resolved$y_lab_final
+  y_axis_theme   <- y_lab_resolved$y_axis_theme
+
+  num_labels <- length(levels(fct_drop(as.factor(dat[[x_var]]))))
+
+  buffer <- mean(dat[[y_var]], na.rm = TRUE) / 4
+  ylim   <- c(0, ceiling(max(dat[[y_var]], na.rm = TRUE) + buffer))
+
+  dat %>%
+    filter(!is.na(!!sym(x_var))) %>%
+    mutate(
+      !!sym(x_var) := map_chr(
+        as.character(!!sym(x_var)),
+        wrap_text,
+        num_labels = num_labels,
+        char_width = 0.08
+      ),
+      !!sym(x_var) := factor(!!sym(x_var), levels = unique(!!sym(x_var))),
+      !!sym(fill_var) := as.factor(!!sym(fill_var))
+    ) %>%
+    ggplot(aes(x = !!sym(x_var), y = !!sym(y_var), fill = !!sym(fill_var))) +
+    geom_col(position = "dodge2") +
+    geom_text(
+      aes(label = round(!!sym(y_var), 1)),
+      position = position_dodge2(0.9),
+      vjust = -1.5,
+      size = 11,
+      size.unit = "pt"
+    ) +
+    scale_fill_brewer(palette = palette) +
+    theme_linedraw() +
+    labs(
+      title = title_wrap,
+      x     = x_lab_wrap,
+      y     = y_lab_final,
+      fill  = fill_lab
+    ) +
+    coord_cartesian(ylim = ylim) +
+    theme(
+      plot.margin  = margin(1, 1, 1, 1),
+      plot.title   = element_text(size = 13, face = "bold"),
+      axis.title   = element_text(size = 11, face = "bold"),
+      axis.title.y = y_axis_theme,
+      axis.text.x  = element_text(margin = margin(b = 10), size = 11),
+      axis.text.y  = element_text(margin = margin(l = 10), size = 11),
+      legend.title = element_text(size = 11, face = "bold"),
+      legend.position = "bottom"
+    )
+
+}
+
+# bar_stacked() ---------------------------------------------------------------
+# Stacked horizontal bar chart for a categorical x numeric variable,
+# grouped by a third factor variable displayed as fill colour.
+# x:           unquoted name of the categorical column for the x-axis
+# y:           unquoted name of the numeric column for the y-axis
+# fill:        unquoted name of the grouping variable mapped to fill colour
+# x_lab:       optional character string for the x-axis title
+# y_lab:       optional character string for the y-axis title
+# fill_lab:    optional character string for the legend title
+# title:       optional — left empty if not supplied
+# palette:     RColorBrewer palette name for fill colours, default "Set2"
+# plot_width:  estimated plot width in inches — used for label wrapping, default 7
+# plot_height: estimated plot height in inches — used for y-axis label wrapping,
+#              default 4
+
+bar_stacked <- function(dat, x, y, fill, x_lab = NULL, y_lab = NULL,
+                        fill_lab = NULL, title = NULL,
+                        palette = "Set2", plot_width = 7, plot_height = 4) {
+
+  x_var    <- as.character(substitute(x))
+  y_var    <- as.character(substitute(y))
+  fill_var <- as.character(substitute(fill))
+
+  x_lab_wrap <- if (!is.null(x_lab)) wrap_text(x_lab, plot_width = plot_width * 0.2) else NULL
+  # x_lab_wrap <- if (!is.null(x_lab)) wrap_text(x_lab, plot_width = plot_width) else NULL
+  y_lab_wrap <- if (!is.null(y_lab)) wrap_text(y_lab, plot_width = plot_width) else NULL
+  title_wrap <- if (!is.null(title)) wrap_text(title, plot_width = plot_width) else NULL
+
+  num_labels <- length(levels(fct_drop(as.factor(dat[[x_var]]))))
+  bar_width  <- bar_width_from_n(num_labels)
+
+  buffer <- mean(dat[[y_var]], na.rm = TRUE) / 4
+  ylim   <- c(0, ceiling(max(dat[[y_var]], na.rm = TRUE) + buffer))
+
+  dat %>%
+    filter(!is.na(!!sym(x_var))) %>%
+    mutate(
+      !!sym(x_var) := map_chr(
+        as.character(!!sym(x_var)),
+        wrap_text,
+        num_labels = num_labels,
+        char_width = 0.08
+      ),
+      !!sym(x_var) := factor(!!sym(x_var), levels = unique(!!sym(x_var))),
+      !!sym(fill_var) := as.factor(!!sym(fill_var))
+    ) %>%
+    ggplot(aes(x = !!sym(x_var), y = !!sym(y_var), fill = !!sym(fill_var))) +
+    geom_col(position = "stack", width = bar_width) +
+    geom_text(
+      aes(label = round(!!sym(y_var), 1)),
+      position = position_stack(vjust = 0.5),
+      size = 11,
+      size.unit = "pt"
+    ) +
+    scale_fill_brewer(palette = palette) +
+    coord_flip() +
+    theme_gray() +
+    labs(
+      title = title_wrap,
+      x     = x_lab_wrap,
+      y     = y_lab_wrap,
+      fill  = fill_lab
+    ) +
+    theme(
+      plot.margin  = margin(1, 1, 1, 1),
+      plot.title   = element_text(size = 13, face = "bold"),
+      axis.title   = element_text(size = 11, face = "bold"),
+      axis.title.y = element_text(angle = 0, vjust = 0.5, size = 11, face = "bold"),
+      axis.text.x  = element_text(margin = margin(b = 10), size = 11),
+      axis.text.y  = element_text(margin = margin(l = 10), size = 11),
+      legend.title     = element_text(size = 11, face = "bold"),
+      legend.position  = "bottom",
+      legend.direction = "horizontal"
+    )
+
+}
+
+```
+
+<br>
+
+## Examples
+
+```{r}
+
+data_frame %>% glimpse
+
+```
+
+:::: panel-tabset
+### Basic
+
+```{r}
+
+bar(dat = data_frame %>% mutate(estimate = estimate * 100), 
+    x = o_cat, 
+    y = estimate, 
+    fill = "softblue",
+    x_lab = data_frame$o_lab %>% unique, 
+    y_lab = "%", 
+    title = NULL)
+
+```
+
+### Orange
+
+```{r}
+
+bar(dat = data_frame %>% mutate(estimate = estimate * 100), 
+    x = o_cat, 
+    y = estimate, 
+    fill = "orange",
+    x_lab = data_frame$o_lab %>% unique, 
+    y_lab = "Percentage", 
+    title = "Plot of sorts")
+
+```
+
+### y-axis label
+
+```{r}
+
+bar(dat = data_frame %>% mutate(estimate = estimate * 100), 
+    x = o_cat, 
+    y = estimate, 
+    x_lab = data_frame$o_lab %>% unique, 
+    y_lab = "Percentage - very long label text, arbitrarily added to test how this functions.")
+
+```
+
+### Lib-auth scale
+
+```{r}
+
+(data_frame2 <- calc_stats(
+  data = df2, 
+  outcome ="libauth", 
+  predictors = "RSex",
+  statistics = "mean"
+  )
+ )
+
+data_frame2 %>% glimpse
+
+bar(dat = data_frame2, 
+    x = p_cat1, 
+    y = estimate, 
+    x_lab = "Sex", 
+    y_lab = "Mean", 
+    title = "Libertarian authoritarian scale") 
+
+
+```
+
+### Clustered bar
+
+```{r}
+glimpse(df2)
+
+data_frame3 <- calc_stats(
+  data = df2, outcomes = "welfare3", predictors = c("RSex"), statistics = "perc"
+  ) %>% 
+  mutate(estimate = round(estimate * 100,1))
+
+data_frame3
+
+bar_clustered(
+  dat = data_frame3, 
+  x = "o_cat",
+  fill = "p_cat1",
+  y = "estimate", 
+  x_lab = data_frame3$o_lab %>% unique, 
+  y_lab = "%", 
+  fill_lab =  data_frame3$p_lab1 %>% unique %>% grep("Total", ., value = T, invert = T), 
+  title = "Left right scale, crosstabulated by sex"
+)
+
+```
+
+<br>
+
+### Other palettes
+
+Not sure about any of these really.
+
+::: panel-tabset
+```{r, results='asis'}
+
+palettes <- c("Set2", "Set1", "Dark2", "Paired", "RdBu", "PuOr", "RdYlGn", "Blues", "YlOrRd")
+
+for (pal in palettes) {
+  
+  cat("####", pal, "\n\n")
+  
+  RColorBrewer::display.brewer.pal(n = 8, name = pal)
+  title(pal)
+  
+  cat("\n\n")
+  
+  bar_clustered(
+    dat = data_frame3, 
+    x = "o_cat",
+    fill = "p_cat1",
+    y = "estimate", 
+    x_lab = data_frame3$o_lab %>% unique, 
+    y_lab = "%", 
+    fill_lab =  data_frame3$p_lab1 %>% unique %>% grep("Total", ., value = T, invert = T), 
+    title = "Left right scale, crosstabulated by sex", 
+    palette = pal
+  ) %>% print()
+  
+    cat("\n\n")
+  
+}
+```
+:::
+
+<br>
+
+### Stacked plots
+
+<br>
+
+```{r}
+
+bar_stacked
+
+bar_stacked(
+  dat = data_frame3, 
+  x = "p_cat1",
+  fill = "o_cat",
+  y = "estimate", 
+  x_lab = data_frame3$p_lab1 %>% unique %>% grep("Total", ., value = T, invert = T),
+  y_lab = "%", 
+  fill_lab = data_frame3$o_lab %>% unique, 
+  title = "Left right scale, crosstabulated by sex", 
+  palette = "Set2"
+)
+
+
+
+```
+::::
