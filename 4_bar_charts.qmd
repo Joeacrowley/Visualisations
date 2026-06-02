@@ -12,19 +12,19 @@ library(ggpubr)
 data(mpg)
 ```
 
-Every row in mpg is a car, every column a feature of that car. mpg stands for miles per gallon. 
+Every row in mpg is a car, every column a feature of that car. mpg stands for miles per gallon.
 
 ```{r}
 head(mpg)
 ```
 
-<br> 
+<br>
 
-## Basics of bar charts    
+## Basics of bar charts
 
-These uses the geom_col() function to display values *in* the data, geom_bar() to count the cases in a group.   
- 
-In this example, average highway miles per gallon (hwy) is displayed by a the type of car (class).  
+These uses the geom_col() function to display values *in* the data, geom_bar() to count the cases in a group.
+
+In this example, average highway miles per gallon (hwy) is displayed by a the type of car (class).
 
 ```{r}
 
@@ -38,7 +38,7 @@ In this example, average highway miles per gallon (hwy) is displayed by a the ty
 
 ### A basic bar chart
 
-That data is then fed to ggplot to produce a simple bar chart. 
+That data is then fed to ggplot to produce a simple bar chart.
 
 ```{r}
 
@@ -47,7 +47,7 @@ ggplot(data=hwy_class) +
 
 ```
 
-<br> 
+<br>
 
 ### A horizontal bar chart
 
@@ -59,7 +59,7 @@ ggplot(data=hwy_class) +
 
 <br>
 
-## Amend fill colour 
+## Amend fill colour
 
 <br>
 
@@ -90,7 +90,7 @@ ncol = 1, nrow = 3)
 
 <br>
 
-### Fill by another variable  
+### Fill by another variable
 
 ```{r}
 
@@ -102,7 +102,7 @@ ncol = 1, nrow = 3)
 
 <br>
 
-The second variable is now the fill colour. 
+The second variable is now the fill colour.
 
 ```{r}
 
@@ -113,7 +113,7 @@ ggplot(data=hwy_class_year, aes(x=class, y=average_hwy_year, fill=year)) +
 
 <br>
 
-The position argument (setting dodge2) moves the bars to appear alongside each other rather than stacked. 
+The position argument (setting dodge2) moves the bars to appear alongside each other rather than stacked.
 
 ```{r}
 
@@ -126,13 +126,13 @@ plot
 
 <br>
 
-## Adding labels to data 
+## Adding labels to data
 
-The geom_text function is what adds the labels: 
+The geom_text function is what adds the labels:
 
- * had to move the aes() bit out of the geom_bar() bit to make this work.  
- * the vjust bit moves it above and below the bar. A lower minus number would be higher above the bar.  
- 
+-   had to move the aes() bit out of the geom_bar() bit to make this work.\
+-   the vjust bit moves it above and below the bar. A lower minus number would be higher above the bar.
+
 ```{r}
 ggplot(data=hwy_class) +
   aes(x=class, y=average_hwy) +
@@ -142,7 +142,7 @@ ggplot(data=hwy_class) +
 
 <br>
 
-Here the label is below the bar, vjust=1.5. The colour has been switched to white and the size increased also. 
+Here the label is below the bar, vjust=1.5. The colour has been switched to white and the size increased also.
 
 ```{r}
 ggplot(data=hwy_class) +
@@ -151,9 +151,9 @@ ggplot(data=hwy_class) +
   geom_text(aes(label=average_hwy), vjust=1.5, colour="white",  size=6)
 ```
 
-#### Adding them to our dodged plot above. 
+#### Adding them to our dodged plot above.
 
-We also have to 'dodge' the position of the labels within geom_text, again in the position argument. 
+We also have to 'dodge' the position of the labels within geom_text, again in the position argument.
 
 ```{r}
 
@@ -165,17 +165,17 @@ plot +
 
 <br><br>
 
-## Other formatting 
+## Other formatting
 
-<br> 
+<br>
 
 ### Bar width
 
-Amend bar width within geom_col argument with 'width'. 
+Amend bar width within geom_col argument with 'width'.
 
-The default is 0.9, smaller values make bars smaller. Max = 1 and removes all space between bars. 
+The default is 0.9, smaller values make bars smaller. Max = 1 and removes all space between bars.
 
-If you make the entire graph wider or narrower, the bar dimensions will scale proportionally. 
+If you make the entire graph wider or narrower, the bar dimensions will scale proportionally.
 
 ```{r}
 
@@ -191,9 +191,9 @@ ggarrange(more_space, less_space, ncol = 1)
 
 <br>
 
-### Change colours   
+### Change colours
 
-In the below the colour affects only the outline, without the fill the bars would be dark grey still.  
+In the below the colour affects only the outline, without the fill the bars would be dark grey still.
 
 ```{r}
 ggplot(data=hwy_class) +
@@ -202,9 +202,10 @@ ggplot(data=hwy_class) +
 
 <br>
 
-Or bar colour can be changed by groups.  
+Or bar colour can be changed by groups.
 
- * Add colour=var, where var is the variable you want to vary the colours by. 
+-   Add colour=var, where var is the variable you want to vary the colours by.
+
 ```{r}
 ggplot(data=hwy_class) +
   aes(x=class, y=average_hwy, colour=class) +
@@ -228,7 +229,7 @@ p + theme_minimal()
 
 ## Select categories to show
 
-You can also select which items to show:  
+You can also select which items to show:
 
 ```{r}
 
@@ -246,7 +247,7 @@ ggplot(data=hwy_class) +
 
 #### Barplot of counts
 
-Similar to a histogram, the stat="bin" command allows ggplot() to work like table(), but specifically for *numeric* values.  
+Similar to a histogram, the stat="bin" command allows ggplot() to work like table(), but specifically for *numeric* values.
 
 ```{r}
 
@@ -258,7 +259,7 @@ ggplot(data=mpg) +
 
 <br>
 
-Or with *character* values, try geom_bar without an argument. 
+Or with *character* values, try geom_bar without an argument.
 
 ```{r}
 
@@ -275,7 +276,8 @@ ggplot(data=mpg) +
 ```{r load_packages, warning=FALSE, message=FALSE}
 library(haven)
 library(labelled)
-bsa <- read_sav("/Users/joecrowley/R/Data/BSA Teaching Data/spss/spss24/bsa2017_for_ukda.sav")
+library(here)
+bsa <- readRDS(here::here("data", "synthetic_bsa_2017.rds"))
 # names(bsa)
 ```
 
@@ -284,7 +286,6 @@ bsa <- read_sav("/Users/joecrowley/R/Data/BSA Teaching Data/spss/spss24/bsa2017_
 ### Bar chart for 1 way crossbreak (or for a frequency table)
 
 ```{r}
-bsa %>% count(as_factor(leftrigh, levels = "both"))
 
 (leftrigh <- bsa %>% 
   mutate(dolefidl = as_factor(dolefidl), 
@@ -294,8 +295,6 @@ bsa %>% count(as_factor(leftrigh, levels = "both"))
   summarise(leftrigh = mean(leftrigh, na.rm = TRUE), 
             n = n())) 
 ```
-
-
 
 ```{r}
 dynamic_str_wrap <- function(text, plot_width = 7, num_labels = 1, char_width = 0.1, margin = 0.1) {
@@ -562,14 +561,13 @@ plot + scale_fill_manual(values = rev(c(nmg,"grey")))
 
 ```
 
-
 <br><br>
 
 ### Exploration of **str_wrap**
 
-Takes a positive integer giving the target line width (in number of characters).   
+Takes a positive integer giving the target line width (in number of characters).
 
-A width less than or equal to 1 will put each word on its own line.   
+A width less than or equal to 1 will put each word on its own line.
 
 ```{r}
 
@@ -600,11 +598,11 @@ sum(cat_lengths) / 2.54
 
 ## Functions
 
-<br> 
+<br>
 
-### A frequency bar chart 
+### A frequency bar chart
 
-Decide to use: age and where someone would go for advice, I can then use for a crosstab later as well. 
+Decide to use: age and where someone would go for advice, I can then use for a crosstab later as well.
 
 ```{r}
 
@@ -620,7 +618,7 @@ bsa %>% count(RAgecat5, hadvice)
 
 <br>
 
-**Step 1** will be to create a function to generate a table of data, to then plot. 
+**Step 1** will be to create a function to generate a table of data, to then plot.
 
 ```{r}
 
@@ -656,9 +654,9 @@ hadvice
 
 ```
 
-<br> 
+<br>
 
-**Step 2:** Decant that data into a ggplot of approved type 
+**Step 2:** Decant that data into a ggplot of approved type
 
 ```{r}
 
@@ -713,7 +711,7 @@ ylim <- c(0, ceiling(max(hadvice$p, na.rm = TRUE) + buffer))
 
 ```
 
-** Step 3:** Decant that bar chart code into a function
+\*\* Step 3:\*\* Decant that bar chart code into a function
 
 ```{r}
 
@@ -831,7 +829,7 @@ bar(hadvice, colour = "#7082d4")
 
 ```
 
-<br> 
+<br>
 
 **Step 4:** see if it works well with other variables...
 
@@ -848,7 +846,7 @@ bsa %>% freq(RAgecat5) %>% bar(colour = "pal", palette = "OrRd")
 
 ```
 
-<br> 
+<br>
 
 ### X by Y bar chart, labelling Y values
 
@@ -1006,6 +1004,3 @@ plot_xy(leftrigh, .pal_var = "ncl_oppo2")
 
 
 ```
-
-
-

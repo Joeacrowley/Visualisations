@@ -11,12 +11,20 @@ library(flextable)
 library(haven)
 library(labelled)
 library(huxtable)
+library(here)
 
-# Set path to and Load data
-source("Set file paths.R")
-## Load functions
-source("/Users/joecrowley/R/Descriptives/Scripts/source_folder_r.R")
-source_folder_r("/Users/joecrowley/R/Descriptives/Scripts", verbose = T)
+# Load data
+# df2    <- readRDS(here::here("data", "synthetic_multicode_data.rds"))
+df2 <- readRDS(here::here("data", "synthetic_bsa_clean.rds"))
+df_svy <- df2 %>% as_survey_design(weights = WtFactor)
+
+
+## Load functions from Descriptives project on GitHub
+scripts <- jsonlite::fromJSON(
+  "https://api.github.com/repos/Joeacrowley/Descriptives/contents/Scripts"
+)
+r_scripts <- scripts$download_url[grepl("\\.R$", scripts$name, ignore.case = TRUE)]
+quietly(lapply(r_scripts, source))
 ```
 
 ## Philosophy

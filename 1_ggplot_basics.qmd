@@ -4,19 +4,19 @@ format: html
 editor: visual
 ---
 
-<br>  
+<br>
 
-**Sources:**   
+**Sources:**
 
- * [ggplot2 guidance](https://ggplot2.tidyverse.org/)  
- * [R for data science](https://r4ds.had.co.nz/data-visualisation.html)  
- * [Plotting anything with ggplot2 - video guide](https://www.youtube.com/watch?v=h29g21z0a68&ab_channel=ThomasLinPedersen)  
- * [R graphics cookbook](https://r-graphics.org/recipe-quick-bar)   
- * [Bar plots](http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualization#barplot-with-a-numeric-x-axis)  
+-   [ggplot2 guidance](https://ggplot2.tidyverse.org/)\
+-   [R for data science](https://r4ds.had.co.nz/data-visualisation.html)\
+-   [Plotting anything with ggplot2 - video guide](https://www.youtube.com/watch?v=h29g21z0a68&ab_channel=ThomasLinPedersen)\
+-   [R graphics cookbook](https://r-graphics.org/recipe-quick-bar)\
+-   [Bar plots](http://www.sthda.com/english/wiki/ggplot2-barplots-quick-start-guide-r-software-and-data-visualization#barplot-with-a-numeric-x-axis)
 
 <br>
 
-### Introduction  
+### Introduction
 
 ggplot2 is a system for creating graphics, based on *The Grammar of Graphics*. You provide data, tell ggplot2 how to map variables to **aesthetics**, what **graphical primitives** to use, and it takes care of the details.
 
@@ -28,13 +28,14 @@ ggplot2 is a system for creating graphics, based on *The Grammar of Graphics*. Y
 
 ### Topics:
 
-1. the grammar of graphics,   
-2. creating a scatter plot encoding two, then three, variables, 
-3. learn about faceting, stratifying a basic plot by a third variable.   
+1.  the grammar of graphics,\
+2.  creating a scatter plot encoding two, then three, variables,
+3.  learn about faceting, stratifying a basic plot by a third variable.
 
-<br>  
+<br>
 
-#### Load some pacakges  
+#### Load some pacakges
+
 ```{r, warning=FALSE,message=FALSE}
 library(tidyverse)
 library(flextable)
@@ -44,14 +45,15 @@ library(ggpubr)
 
 <br>
 
-#### Load the mpg dataset  
+#### Load the mpg dataset
+
 ```{r}
 data(mpg)
 ```
 
 <br>
 
-Every row in mpg is a car, every column a feature of that car. mpg stands for miles per gallon. 
+Every row in mpg is a car, every column a feature of that car. mpg stands for miles per gallon.
 
 ```{r}
 head(mpg)
@@ -67,54 +69,54 @@ plot(mpg$displ, mpg$hwy)
 
 <br>
 
-This is base R:  
+This is base R:
 
- * Pros: simplicity,
- * Cons: not that pretty, more complex things are not possible. 
+-   Pros: simplicity,
+-   Cons: not that pretty, more complex things are not possible.
 
-Whereas, **ggplot2** is:    
+Whereas, **ggplot2** is:
 
- * less intuitive, harder to start with, 
- * easier to make sophisticated and beautiful plots. 
+-   less intuitive, harder to start with,
+-   easier to make sophisticated and beautiful plots.
 
 <br>
 
-## The structure of statistical graphics  
+## The structure of statistical graphics
 
-A mapping of data variables to aesthetic attributes of geometric objects.  
+A mapping of data variables to aesthetic attributes of geometric objects.
 
-All ggplot2 graphs have these three elements:   
+All ggplot2 graphs have these three elements:
 
-1. a data set (data), 
-2. a geometry (geom), 
-3. an aesthetic mapping (aes).  
+1.  a data set (data),
+2.  a geometry (geom),
+3.  an aesthetic mapping (aes).
 
-The data element is intuitive to me. It is whatever data you feed into the command, where to look for the variables. 
+The data element is intuitive to me. It is whatever data you feed into the command, where to look for the variables.
 
 What is a geometric object? In the simple base R graph above, it is a point. It could be a line, a polygon...
 
-What are the aesthetic attributes of a point? In the base R graph, we have an x co-ordinate, and a y co-ordinate. To construct a plot, we tell the software where to find those two co-ordinates, and therefore where to locate the point. So the aesthetic attributes tell you how to go from the dataset to identify the aesthetic qualities of the graph. 
+What are the aesthetic attributes of a point? In the base R graph, we have an x co-ordinate, and a y co-ordinate. To construct a plot, we tell the software where to find those two co-ordinates, and therefore where to locate the point. So the aesthetic attributes tell you how to go from the dataset to identify the aesthetic qualities of the graph.
 
-James Scott describes these features as adding layers to a plot, each one is a layer, linked by a + symbol.   
-
-<br>
-
-### The grammar of graphics   
-
-![The grammar of graphics](images\Grammar of Graphics.png)
+James Scott describes these features as adding layers to a plot, each one is a layer, linked by a + symbol.
 
 <br>
 
-### An example  
+### The grammar of graphics
 
-This creates a ggplot. The first 'layer' tells ggplot to look at the mpg data, the second layer makes an "aesthetic mapping" (aes) by:  
+![The grammar of graphics](images\Grammar%20of%20Graphics.png)
 
- * linking the variable `displ` with the aesthetic property x (horizontal location), 
- * and linking the variable hwy with the aesthetic property y (vertical location).  
- 
-It then displays the data in a scatter plot, the chosen geometry (geom_point).  
+<br>
 
-Some people think this graph looks nicer than base R's graph, but there is more to it than that.  
+### An example
+
+This creates a ggplot. The first 'layer' tells ggplot to look at the mpg data, the second layer makes an "aesthetic mapping" (aes) by:
+
+-   linking the variable `displ` with the aesthetic property x (horizontal location),
+-   and linking the variable hwy with the aesthetic property y (vertical location).
+
+It then displays the data in a scatter plot, the chosen geometry (geom_point).
+
+Some people think this graph looks nicer than base R's graph, but there is more to it than that.
 
 ```{r}
 ggplot(data=mpg) + 
@@ -123,13 +125,13 @@ ggplot(data=mpg) +
 
 <br>
 
-## Adding layers to a graph  
+## Adding layers to a graph
 
-ggplot2 allows more aesthetic mappings to be added, with more than 2 variables.  
+ggplot2 allows more aesthetic mappings to be added, with more than 2 variables.
 
 ### Point colour
 
-Here the colour option is varied by the class of vehicle. 
+Here the colour option is varied by the class of vehicle.
 
 ```{r}
 ggplot(data=mpg) +
@@ -138,7 +140,7 @@ ggplot(data=mpg) +
 
 <br>
 
-We can also vary colour using a numeric variable, where it produces a fade effect.  
+We can also vary colour using a numeric variable, where it produces a fade effect.
 
 ```{r}
 ggplot(data=mpg) +
@@ -147,15 +149,15 @@ ggplot(data=mpg) +
 
 <br>
 
-### Fill 
+### Fill
 
-Fill performs a similar function to colour.  
+Fill performs a similar function to colour.
 
-However, with geom_point to be able to use fill we need to select a point 'shape' that allows it.  
+However, with geom_point to be able to use fill we need to select a point 'shape' that allows it.
 
-For geom_point, one usable shape 21 (possible ones are 21-25).    
+For geom_point, one usable shape 21 (possible ones are 21-25).
 
-When shape = 21 there is a space inside the point to be filled. Without it, the fill argument has no effect.   
+When shape = 21 there is a space inside the point to be filled. Without it, the fill argument has no effect.
 
 ```{r}
 
@@ -173,7 +175,7 @@ ggarrange(
 
 <br>
 
-With other geoms fill works automatically, as with geom_histogram below.  
+With other geoms fill works automatically, as with geom_histogram below.
 
 ```{r}
 
@@ -187,9 +189,9 @@ ggplot(data=mpg) +
 
 ### Point size
 
-You can also edit other properties of graphs, for example, point size. Although that makes limited sense in this case. 
+You can also edit other properties of graphs, for example, point size. Although that makes limited sense in this case.
 
-R gives a warning here, because categorical variables are not best reflected by point size. 
+R gives a warning here, because categorical variables are not best reflected by point size.
 
 ```{r, collapse=TRUE}
 ggplot(data=mpg) +
@@ -198,7 +200,7 @@ ggplot(data=mpg) +
 
 <br>
 
-Instead, a numeric variable would make more sense. 
+Instead, a numeric variable would make more sense.
 
 ```{r}
 ggplot(data = mpg) + 
@@ -209,16 +211,16 @@ ggplot(data = mpg) +
 
 ### Point transparency
 
-We could also vary the point by transparency: 
+We could also vary the point by transparency:
+
 ```{r, collapse=TRUE}
 ggplot(data=mpg) +
   geom_point(mapping=aes(x=displ, y=hwy, alpha=class))
 ```
 
-### Point shape  
+### Point shape
 
 You can also vary point shape. (![Shape guide](http://www.sthda.com/english/wiki/ggplot2-point-shapes))
-  
 
 ```{r, collapse=TRUE}
 ggplot(data=mpg) +
@@ -227,11 +229,11 @@ ggplot(data=mpg) +
 
 <br>
 
-### Shape outline  
+### Shape outline
 
 Stroke controls the width of the border of a shape. It’s only suitable for shapes which have a border.
 
-Shape is set to 21 so that the border can be distinguished from the fill colour.  
+Shape is set to 21 so that the border can be distinguished from the fill colour.
 
 ```{r, collapse=TRUE}
 
@@ -240,8 +242,7 @@ ggplot(data=mpg) +
 
 ```
 
-When applied to a line chart we get the warning below, indicating stroke is ignored.  
-
+When applied to a line chart we get the warning below, indicating stroke is ignored.
 
 ```{r, collapse=TRUE}
 
@@ -252,9 +253,9 @@ ggplot(data=mpg) +
 
 <br>
 
-### Combining layers  
+### Combining layers
 
-Multiple characteristics can also be applied in the same plot. Here the displ variable controls both the size and colour of the points (also shown, but not explained, above).  
+Multiple characteristics can also be applied in the same plot. Here the displ variable controls both the size and colour of the points (also shown, but not explained, above).
 
 ```{r}
 ggplot(data = mpg) + 
@@ -265,23 +266,21 @@ ggplot(data = mpg) +
 
 You can get quite nuanced with this. In the code below:
 
-* colour sets the border of the shape to white.  
-* colour is visible only because shape equals 21, with other values of shape it would not be visible.    
-* size controls point size.   
-* fill, with aes(), fills the points with colours linked to the `drv` variable, again visible only because shape = 21.  
+-   colour sets the border of the shape to white.\
+-   colour is visible only because shape equals 21, with other values of shape it would not be visible.\
+-   size controls point size.\
+-   fill, with aes(), fills the points with colours linked to the `drv` variable, again visible only because shape = 21.
 
 ```{r}
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point(mapping = aes(fill = drv), shape=21, colour="white", size=3, stroke=2)
 ```
 
-
 <br>
 
 ### Transforming numeric to logical variables
 
-Here ‘displ < 5’ is a logical - TRUE/FALSE - statement. The TRUE cases are one colour, the FALSE are another.
-
+Here ‘displ \< 5’ is a logical - TRUE/FALSE - statement. The TRUE cases are one colour, the FALSE are another.
 
 ```{r}
 
@@ -294,9 +293,9 @@ geom_point(mapping = aes(x = displ, y = hwy, colour = displ < 5))
 
 ### Adding data labels
 
-Rather surprisingly font size has a dramatic effect. Size 11 is huge. 
+Rather surprisingly font size has a dramatic effect. Size 11 is huge.
 
-Also an issue around how to intelligently extend the plot margins to contain the data labels when outside the bars. How far they should extend depends on the plot size, which differs depending on faceting and similar. 
+Also an issue around how to intelligently extend the plot margins to contain the data labels when outside the bars. How far they should extend depends on the plot size, which differs depending on faceting and similar.
 
 ```{r}
 
@@ -322,7 +321,7 @@ ggarrange(chart, chart2, chart3, chart4, ncol = 2, nrow = 2)
 
 <br>
 
-Note the font size of bars cannot be set within theme using text = element_text (more on this below). 
+Note the font size of bars cannot be set within theme using text = element_text (more on this below).
 
 One tricky thing is that this size is in mm while the size of element_text() is in pt.
 
@@ -346,11 +345,11 @@ nrow = 2)
 
 <br><br>
 
-## Adding facets  
+## Adding facets
 
-Stratifying a plot is done with the facet_wrap commands, it runs a separate graph for each sub-group.  
+Stratifying a plot is done with the facet_wrap commands, it runs a separate graph for each sub-group.
 
-The facet layer is considered a 'third' layer to the graph. The geometry and aesthetic mapping above are actually part of one layer.  
+The facet layer is considered a 'third' layer to the graph. The geometry and aesthetic mapping above are actually part of one layer.
 
 ```{r}
 ggplot(data=mpg) + 
@@ -359,7 +358,7 @@ ggplot(data=mpg) +
  # The nrow specifies display results over two rows. 
 ```
 
-Switching to control number of columns... 
+Switching to control number of columns...
 
 ```{r}
 ggplot(data=mpg) + 
@@ -367,7 +366,7 @@ ggplot(data=mpg) +
   facet_wrap(~ class, ncol=2)
 ```
 
-If the number of row and columns is specified and does not allow enough panels, you will get an error. 
+If the number of row and columns is specified and does not allow enough panels, you will get an error.
 
 ```{r, error=TRUE, collapse=TRUE}
 ggplot(data=mpg) + 
@@ -379,7 +378,7 @@ ggplot(data=mpg) +
 
 #### Using a continuous variable as a facet argument
 
-Does not work so well.  
+Does not work so well.
 
 ```{r}
 ggplot(data = mpg) + 
@@ -389,7 +388,7 @@ ggplot(data = mpg) +
 
 <br>
 
-### Using a grid display  
+### Using a grid display
 
 You can also divide your data by a combination of two variables, but frankly this is confusing.
 
@@ -403,7 +402,7 @@ ggplot(data = mpg) +
 
 #### Switch to a horizontal split for facet_grid
 
-As standard, grids are split along one row with multiple columns. 
+As standard, grids are split along one row with multiple columns.
 
 ```{r}
 ggplot(data = mpg) + 
@@ -411,7 +410,7 @@ ggplot(data = mpg) +
   facet_grid(~drv)
 ```
 
-Add ~. to present this with one column and multiple rows. 
+Add \~. to present this with one column and multiple rows.
 
 ```{r}
 ggplot(data = mpg) + 
@@ -421,11 +420,11 @@ ggplot(data = mpg) +
 
 <br><br>
 
-### Adding further layers  
+### Adding further layers
 
-Additional layers can be added after this.  
+Additional layers can be added after this.
 
-Here, labels.   
+Here, labels.
 
 ```{r}
 ggplot(data=mpg) + 
@@ -441,9 +440,9 @@ ggplot(data=mpg) +
 
 <br><br>
 
-## Saving plots as an object   
+## Saving plots as an object
 
-This saves your basic plot as an object, and you can now experiment with adding more layers to it, and see what you like best.   
+This saves your basic plot as an object, and you can now experiment with adding more layers to it, and see what you like best.
 
 ```{r}
 pl <- ggplot(data=mpg) + 
@@ -452,13 +451,13 @@ pl <- ggplot(data=mpg) +
 
 <br>
 
-Here we try adding a facet_wrap using class, with one row of panels. 
+Here we try adding a facet_wrap using class, with one row of panels.
 
 ```{r}
 pl + facet_wrap(~class, nrow=1)
 ```
 
-If we don't like that, try it with two. 
+If we don't like that, try it with two.
 
 ```{r}
 pl + facet_wrap(~class, nrow=2)
@@ -466,11 +465,11 @@ pl + facet_wrap(~class, nrow=2)
 
 <br><br>
 
-## Manually changing plot characteristics  
+## Manually changing plot characteristics
 
-You can also manually change an aesthetic property by putting it outside the aes() command. 
+You can also manually change an aesthetic property by putting it outside the aes() command.
 
-Here we simply make all the points blue. 
+Here we simply make all the points blue.
 
 ```{r}
 ggplot(data=mpg) + 
@@ -479,7 +478,7 @@ ggplot(data=mpg) +
 
 <br>
 
-Here colour needs to be specified outside of the aes() argument, otherwise it has no effect. There is no error warning helpfully.  
+Here colour needs to be specified outside of the aes() argument, otherwise it has no effect. There is no error warning helpfully.
 
 ```{r}
 ggplot(data = mpg) + 
@@ -497,20 +496,23 @@ ggplot(data=mpg) +
 
 <br><br>
 
-## Using aes() on its own layer  
-The aes() step can form its own layer, separate to the geom_point() one. 
+## Using aes() on its own layer
 
-With only the aes() step specified we have associated the x axis with displ and the y axis with hwy, but no graph is shown. geom_point() specifies the graph to be shown. 
+The aes() step can form its own layer, separate to the geom_point() one.
+
+With only the aes() step specified we have associated the x axis with displ and the y axis with hwy, but no graph is shown. geom_point() specifies the graph to be shown.
+
 ```{r}
 ggplot(data=mpg) + aes(x=displ, y=hwy)
 ```
 
 Adding the graph type:
+
 ```{r}
 ggplot(data=mpg) + aes(x=displ, y=hwy) + geom_point()
 ```
 
-This seems largely useless, but it does illustrate the differences between these steps, and possibly you could create an empty plot, with axis specified, and then feed that into different geom_point() steps. Not sure that's really useful though. 
+This seems largely useless, but it does illustrate the differences between these steps, and possibly you could create an empty plot, with axis specified, and then feed that into different geom_point() steps. Not sure that's really useful though.
 
 <br><br>
 
@@ -518,13 +520,13 @@ This seems largely useless, but it does illustrate the differences between these
 
 <br>
 
-To answer this, look at the two charts below and consider - how are they similar?  
+To answer this, look at the two charts below and consider - how are they similar?
 
-Both plots contain the same x variable, the same y variable, and both describe the same data. But the plots are not identical. Each plot uses a different visual object to represent the data. In ggplot2 syntax, we say that they use different geoms.  
+Both plots contain the same x variable, the same y variable, and both describe the same data. But the plots are not identical. Each plot uses a different visual object to represent the data. In ggplot2 syntax, we say that they use different geoms.
 
-> A geom is the geometrical object that a plot uses to represent data.  
+> A geom is the geometrical object that a plot uses to represent data.
 
-People often describe plots by the type of geom that the plot uses. For example, bar charts use bar geoms, line charts use line geoms, boxplots use boxplot geoms, and so on. Scatterplots break the trend; they use the point geom. 
+People often describe plots by the type of geom that the plot uses. For example, bar charts use bar geoms, line charts use line geoms, boxplots use boxplot geoms, and so on. Scatterplots break the trend; they use the point geom.
 
 As we see below, you can use different geoms to plot the same data. The plot on the left uses the point geom, and the plot on the right uses the smooth geom, a smooth line fitted to the data.
 
@@ -539,7 +541,7 @@ ggarrange(
 
 <br>
 
-Every geom function in ggplot2 takes a mapping argument. However, not every aesthetic works with every geom. 
+Every geom function in ggplot2 takes a mapping argument. However, not every aesthetic works with every geom.
 
 You could set the shape of a point, but you couldn’t set the “shape” of a line. On the other hand, you could set the linetype of a line. geom_smooth() will draw a different line, with a different linetype, for each unique value of the variable that you map to linetype.
 
@@ -552,13 +554,13 @@ ggplot(data = mpg) +
 
 <br>
 
-## Putting multiple geoms in a plot    
+## Putting multiple geoms in a plot
 
 If the above sounds strange, we can make it more clear by overlaying the lines on top of the raw data and then coloring everything according to drv.
 
-To display multiple geoms in the same plot, add multiple geom functions to ggplot(). 
+To display multiple geoms in the same plot, add multiple geom functions to ggplot().
 
-In this  plot we pass the mapping function to ggplot at the same time as the data command. ggplot2 will treat these mappings as global mappings that apply to each geom in the graph.
+In this plot we pass the mapping function to ggplot at the same time as the data command. ggplot2 will treat these mappings as global mappings that apply to each geom in the graph.
 
 ```{r, collapse=TRUE}
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy, linetype = drv, colour=drv)) + 
@@ -568,7 +570,7 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy, linetype = drv, colour=drv)
 
 <br>
 
-Alternatively, you can achieve the same by specifying the aesthetic arguments for each geom separately.  
+Alternatively, you can achieve the same by specifying the aesthetic arguments for each geom separately.
 
 ```{r, collapse=TRUE}
 
@@ -580,7 +582,7 @@ ggplot(data = mpg) +
 
 <br>
 
-However, the code above introduces some duplication in our code. 
+However, the code above introduces some duplication in our code.
 
 Imagine if you wanted to change the y-axis to display cty instead of hwy. You’d need to change the variable in two places, and you might forget to update one. You can avoid this type of repetition by passing a set of mappings to ggplot() (as in the first chart above).
 
@@ -596,19 +598,19 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
 
 ```
 
-## Different data for different layers... 
+## Different data for different layers...
 
-You can use the same idea to specify different data for each layer. 
+You can use the same idea to specify different data for each layer.
 
-Here, our smooth line displays just a subset of the mpg dataset, the subcompact cars. 
+Here, our smooth line displays just a subset of the mpg dataset, the subcompact cars.
 
 The local data argument in geom_smooth() overrides the global data argument in ggplot() for that layer only.
 
-**Notes:**  
+**Notes:**
 
-* The standard colours in ggplot can be found [here](https://www.statology.org/ggplot-default-colors/), the lilac colur for subcompact cars has been manually selected for the line so it matches the point colours used for it.    
+-   The standard colours in ggplot can be found [here](https://www.statology.org/ggplot-default-colors/), the lilac colur for subcompact cars has been manually selected for the line so it matches the point colours used for it.
 
-* The se=FALSE argument removes the confidence interval around the smooth line. Assuming that is a confidence interval.
+-   The se=FALSE argument removes the confidence interval around the smooth line. Assuming that is a confidence interval.
 
 ```{r, collapse=TRUE}
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
@@ -616,9 +618,9 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
   geom_smooth(data = filter(mpg, class == "subcompact"), colour="#C77CFF", se = FALSE)
 ```
 
-<br><br>  
+<br><br>
 
-## The group aesthetic   
+## The group aesthetic
 
 Many geoms, like geom_smooth(), use a single geometric object to display multiple rows of data. For these geoms, you can set the group aesthetic to a categorical variable to draw multiple objects. ggplot2 will draw a separate object for each unique value of the grouping variable.
 
@@ -645,11 +647,11 @@ ggarrange(
 
 ```
 
-<br><br> 
+<br><br>
 
-## Colour palettes  
+## Colour palettes
 
-You can manually define colour palettes and feed them to the **scale_colour_manual** argument.  
+You can manually define colour palettes and feed them to the **scale_colour_manual** argument.
 
 ```{r}
 
@@ -663,7 +665,7 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy, colour = drv)) +
 
 <br>
 
-Or use predefined palettes from various packages, such RColorBrewer.  
+Or use predefined palettes from various packages, such RColorBrewer.
 
 ```{r}
 
@@ -684,7 +686,7 @@ In the below the margin is a space left around the plot (as a proportion of the 
 
 char_width: is an estimate of the average width of a character. Adjust this based on your specific font and size.
 
-For "sans" at font size 11 try 0.08 inches, I have left it as 0.1 as below to be generous. Size 12 apparently would only be 0.083333 inches. 
+For "sans" at font size 11 try 0.08 inches, I have left it as 0.1 as below to be generous. Size 12 apparently would only be 0.083333 inches.
 
 ```{r}
 
@@ -733,7 +735,7 @@ ggplot(df, aes(x = x_wrapped, y = y)) +
 
 ```
 
-Adjusting the code above to work within a mutate framework. 
+Adjusting the code above to work within a mutate framework.
 
 ```{r}
 
@@ -783,9 +785,9 @@ ggplot(df, aes(x = x_wrapped, y = y)) +
 
 ## element_text()
 
-element_ _text() modifies label and headings. 
+element\_ \_text() modifies label and headings.
 
-You can control the font family, face, colour, size (in points), hjust, vjust, angle (in degrees) and lineheight (as ratio of fontcase). More details on the parameters can be found in vignette("ggplot2-specs"). 
+You can control the font family, face, colour, size (in points), hjust, vjust, angle (in degrees) and lineheight (as ratio of fontcase). More details on the parameters can be found in vignette("ggplot2-specs").
 
 ```{r}
 
@@ -806,9 +808,9 @@ ggarrange(text_amend, text_amend2,
 
 <br>
 
-You can also control the margins around text with margin(). The amount of sapce in points around the top, right, bottom and left sides of the text. Elements not specified equal zero. 
+You can also control the margins around text with margin(). The amount of sapce in points around the top, right, bottom and left sides of the text. Elements not specified equal zero.
 
-There does not seem to be a uniform default for the margins. 
+There does not seem to be a uniform default for the margins.
 
 ```{r}
 
@@ -820,7 +822,7 @@ ggarrange(text_amend + theme(plot.title = element_text(margin = margin())),
 
 <br>
 
-With all axis headings specified. 
+With all axis headings specified.
 
 ```{r}
 
@@ -842,29 +844,29 @@ text_amend
 
 <br>
 
-## Theme elements  
+## Theme elements
 
-For this the modifying theme components section of the [ggplot2 book](https://ggplot2-book.org/themes#modifying-theme-components).  
+For this the modifying theme components section of the [ggplot2 book](https://ggplot2-book.org/themes#modifying-theme-components).
 
 There are around 40 unique elements that control the appearance of the plot. They can be roughly grouped into five categories: plot, axis, legend, panel and facet. The following sections describe each in turn.
 
 <br>
 
-### Plot  
+### Plot
 
-* plot.background - set by element_rect()    
-* plot.title - set by element_text()    
-* plot.margin  - set by margin()   
+-   plot.background - set by element_rect()\
+-   plot.title - set by element_text()\
+-   plot.margin - set by margin()
 
-Of these I am quite happy with plot.background, and plot.title is covered above under text editing. 
+Of these I am quite happy with plot.background, and plot.title is covered above under text editing.
 
-The plot.margin is by standard set to 5.5pt on all sides, for e.g. see theme_grey. 
+The plot.margin is by standard set to 5.5pt on all sides, for e.g. see theme_grey.
 
 ```{r}
 theme_grey()$plot.margin
 ```
 
-Some example edits below, but perhaps 5.5 is ok too. It may be best to minimise to maximise plot space. 
+Some example edits below, but perhaps 5.5 is ok too. It may be best to minimise to maximise plot space.
 
 ```{r}
 
@@ -879,11 +881,11 @@ nrow = 2)
 
 ### Axis elements
 
-There are several axis elements that can be controlled. Of these I am going to be most interested in:   
+There are several axis elements that can be controlled. Of these I am going to be most interested in:
 
-* axis.title,  axis.title.x and  axis.title.y - controlled by element_text().  
+-   axis.title, axis.title.x and axis.title.y - controlled by element_text().
 
-Again I have covered these under text edits.  
+Again I have covered these under text edits.
 
 Maybe of interest is the angle of labels. The most common adjustment is to rotate the x-axis labels to avoid long overlapping labels. If you do this, note negative angles tend to look best and you should set hjust = 0 and vjust = 1:
 
@@ -900,7 +902,7 @@ base +
   ylab("axis label y")
 ```
 
-Note that margins set on axis text seem to apply only to axis.text, not axis.title. this may be a bug. 
+Note that margins set on axis text seem to apply only to axis.text, not axis.title. this may be a bug.
 
 ```{r}
 base + 
@@ -910,14 +912,13 @@ base +
   axis.text.y = element_text(margin = margin(l = 10)))
 ```
 
+<br>
 
-<br> 
-
-### Legends  
+### Legends
 
 The legend elements control the appearance of all legends. You can also modify the appearance of individual legends by modifying the same elements in guide_legend() or guide_colourbar().
 
-This first set of example relate to legend size, background and text. 
+This first set of example relate to legend size, background and text.
 
 ```{r}
 
@@ -949,7 +950,7 @@ ncol= 3)
 
 <br>
 
-This second set relate to legend position, direction, justification and the surrounding box. 
+This second set relate to legend position, direction, justification and the surrounding box.
 
 ```{r}
 
@@ -970,20 +971,20 @@ ncol = 2, nrow = 2)
 
 ### Panel elements
 
-This is things like the panel grid, the panel border and the aspect ratio. By and large I will ignore these. 
+This is things like the panel grid, the panel border and the aspect ratio. By and large I will ignore these.
 
-<br> 
+<br>
 
-### Facets 
+### Facets
 
-This can cotnrol the background of the panel strips,the strip text, and the panel spacing. 
+This can cotnrol the background of the panel strips,the strip text, and the panel spacing.
 
-The default spacing between panels in faceted plot is 5.5pts.  
+The default spacing between panels in faceted plot is 5.5pts.
 
-Units: The spacing is set using the unit() function from the grid package. Common units include points ("pt"), millimeters ("mm"), and inches ("in").    
+Units: The spacing is set using the unit() function from the grid package. Common units include points ("pt"), millimeters ("mm"), and inches ("in").
 
-* 1 point (pt) is equal to 1/72 of an inch.   
-* Therefore, 1 inch is equal to 72 points.   
+-   1 point (pt) is equal to 1/72 of an inch.\
+-   Therefore, 1 inch is equal to 72 points.
 
 ```{r}
 
@@ -1005,15 +1006,8 @@ ggarrange(base_f, base_f2, base_f3, nrow = 1)
 
 ```
 
-
 <br>
 
-## Further reading  
+## Further reading
 
-* [ggplot extensions](https://exts.ggplot2.tidyverse.org/gallery/)
-
-
-
-
-
-
+-   [ggplot extensions](https://exts.ggplot2.tidyverse.org/gallery/)
