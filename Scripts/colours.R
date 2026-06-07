@@ -1,4 +1,4 @@
-jcolours <-
+ncolours <-
 list(blue = "#9397e1", pink = "#f381a6", mint = "#36bba2", purple = "#bd78b1", 
     orange = "#ff9836", grey = "#8a8a8a", blues = c("#7480d7", 
     "#9397e1", "#afb3e8", "#cbcaf0", "#e7e3f8"), pinks = c("#f0608f", 

@@ -38,7 +38,7 @@ penguin %>% tbl_summary(label = list(
 
 ```{r}
 
-jcolours <- list(
+ncolours <- list(
   blue   = "#9397e1",
   pink   = "#f381a6",
   mint   = "#36bba2",
@@ -78,9 +78,9 @@ jcolours <- list(
       stringsAsFactors = FALSE)
 )
 
-jcolours$blue5
+ncolours$blue5
 
-dump("jcolours", file = "Scripts/colours.R")
+dump("ncolours", file = "Scripts/colours.R")
 
 ```
 
@@ -88,7 +88,7 @@ Review palette....
 
 ```{r}
 
-jcolours$colours_df %>% unlist %>% scales::show_col(cex_label = 0.8, ncol = 5)
+ncolours$colours_df %>% unlist %>% scales::show_col(cex_label = 0.8, ncol = 5)
 
 ```
 
@@ -125,7 +125,7 @@ My preference for most charts is one colour from opaque to low opacity. As shown
 base <- ggplot(mpg, aes(cyl, displ, colour = displ)) +
   geom_point(size = 2) 
 
-base + scale_color_gradient(low = jcolours$colours_diverge_mint[1], high = jcolours$colours_diverge_mint[2])
+base + scale_color_gradient(low = ncolours$colours_diverge_mint[1], high = ncolours$colours_diverge_mint[2])
 
 ```
 
@@ -142,7 +142,7 @@ species <- penguin %>% group_by(species) %>% summarise(n = n()) %>%
 
 bar1 <- species %>% ggplot(aes(x = species, y = species_percent, fill = species)) + 
   geom_col() + 
-  scale_fill_manual(values = jcolours$colours10)
+  scale_fill_manual(values = ncolours$colours10)
 
 bar1
 
@@ -158,7 +158,7 @@ island <- penguin %>% group_by(island) %>% summarise(n = n()) %>%
   mutate(island_percent = 100 * (n/ sum(n)))
 
 bar2 <- island %>% ggplot(aes(x = island, y = island_percent)) + 
-  geom_col(fill = jcolours$blue3) 
+  geom_col(fill = ncolours$blue3) 
 
 bar2
 
@@ -178,7 +178,7 @@ bar5 <- penguin %>% count(sex_island) %>%
   ggplot(aes(x = fct_rev(sex_island), y = n, fill = sex_island)) + 
   geom_col() + 
   coord_flip() + 
-  scale_fill_manual(values = jcolours$colours_pairs)
+  scale_fill_manual(values = ncolours$colours_pairs)
 
 bar5
 
@@ -194,7 +194,7 @@ island_species <- penguin %>% group_by(species, sex) %>% summarise(n = n()) %>% 
 
 bar4 <- island_species %>% ggplot(aes(x = species, y = sex_percent, fill = sex)) + 
   geom_col(position ="dodge2") + 
-  scale_fill_manual(values = jcolours$colours_pairs) + 
+  scale_fill_manual(values = ncolours$colours_pairs) + 
   ylim(c(0,100))
 
 bar4

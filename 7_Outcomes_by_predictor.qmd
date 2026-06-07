@@ -1,0 +1,236 @@
+---
+title: "Outcomes by predictor — worked example"
+format: html
+editor: visual
+---
+
+A worked example looping through a set of categorical and numeric outcome variables, crosstabulated by a single predictor, using the repo bar chart functions and BSA synthetic data. Mirrors the structure of a typical survey analysis output script.
+
+```{r setup, message=FALSE, warning=FALSE, results='hide'}
+library(tidyverse)
+library(srvyr)
+library(haven)
+library(labelled)
+library(here)
+library(officer)
+
+# Load data
+df2    <- readRDS(here::here("data", "synthetic_bsa_clean.rds"))
+df_svy <- df2 %>% as_survey_design(weights = WtFactor)
+
+# Load local scripts
+source(here::here("Scripts/colours.R"))
+source(here::here("Scripts/bar_charts.R"))
+
+# Load calc_stats and dependencies from GitHub
+scripts   <- jsonlite::fromJSON(
+  "https://api.github.com/repos/Joeacrowley/Descriptives/contents/Scripts"
+)
+r_scripts <- scripts$download_url[grepl("\\.R$", scripts$name, ignore.case = TRUE)]
+invisible(lapply(r_scripts, source))
+```
+
+<br>
+
+## Config
+
+Define the outcome variables and predictor to loop over.
+
+```{r config}
+
+# Categorical outcomes — weighted proportions, displayed as stacked bar
+outcomes_cat <- c("welfare3", "skipmeal2", "MuchPov2")
+
+# Numeric outcomes — weighted median, displayed as simple bar
+outcomes_num <- c("libauth", "welfare2", "leftrigh")
+
+# Crosstab predictor
+crosstab <- "RSex"
+
+# Base font size for PowerPoint export
+pptx_base_size <- 12
+
+# Legend position for stacked bar charts — "right" handles long response labels better
+pptx_legend_position <- "right"
+```
+
+<br>
+
+## Helper functions
+
+Two thin wrappers that handle aggregation via `calc_stats` and pass the result to the appropriate bar chart function, plus a PowerPoint export function.
+
+```{r helpers}
+
+# get_base_string() -----------------------------------------------------------
+# Extracts a formatted unweighted base size string from calc_stats output.
+# Expects columns p_cat1 and base. Returns e.g. "Male: n=412 | Female: n=468"
+
+get_base_string <- function(dat) {
+  dat %>%
+    distinct(p_cat1, base) %>%
+    mutate(label = paste0(p_cat1, ": n=", base)) %>%
+    pull(label) %>%
+    paste(collapse = " | ")
+}
+
+
+# export_plots_to_pptx() ------------------------------------------------------
+# Saves a list of ggplots to a PowerPoint file, one plot per slide.
+# plot_list:    list of ggplot objects
+# base_sizes:   optional list of base size strings, one per plot
+# filename:     output path for the .pptx file
+# slide_width:  slide width in inches, default 10
+# slide_height: slide height in inches, default 7.5
+# dpi:          image resolution, default 300
+
+export_plots_to_pptx <- function(plot_list, base_sizes = NULL,
+                                 filename = "output.pptx",
+                                 slide_width = 10, slide_height = 7.5,
+                                 dpi = 300) {
+
+  prs       <- read_pptx()
+  tmp_files <- c()
+
+  img_height <- if (!is.null(base_sizes)) slide_height - 1.25 else slide_height - 1
+
+  for (i in seq_along(plot_list)) {
+
+    tmp <- tempfile(fileext = ".png")
+    ggsave(tmp, plot = plot_list[[i]], width = slide_width - 1,
+           height = img_height, dpi = dpi, bg = "white")
+    tmp_files <- c(tmp_files, tmp)
+
+    prs <- prs |>
+      add_slide(layout = "Blank", master = "Office Theme") |>
+      ph_with(
+        value    = external_img(tmp, width = slide_width - 1, height = img_height),
+        location = ph_location(left = 0.5, top = 0.5,
+                               width = slide_width - 1, height = img_height)
+      )
+
+    if (!is.null(base_sizes) && !is.na(base_sizes[[i]])) {
+      prs <- prs |>
+        ph_with(
+          value = fpar(
+            ftext("Unweighted sample sizes: ",
+                  fp_text(font.size = 12, color = "#666666", bold = TRUE)),
+            ftext(base_sizes[[i]],
+                  fp_text(font.size = 12, color = "#666666"))
+          ),
+          location = ph_location(left = 0.5, top = 0.5 + img_height + 0.1,
+                                 width = slide_width - 1, height = 0.25)
+        )
+    }
+  }
+
+  print(prs, target = filename)
+  unlink(tmp_files)
+  message("Saved: ", filename)
+}
+
+
+# plot_stacked() --------------------------------------------------------------
+# Aggregates a categorical outcome x predictor using weighted proportions and
+# returns a bar_stacked plot.
+
+plot_stacked <- function(outcome, predictor, data) {
+
+  dat <- calc_stats(
+    data       = data,
+    outcomes   = outcome,
+    predictors = list(predictor),
+    statistics = "w_perc"
+  ) %>%
+    filter(cross_break == predictor) %>%
+    mutate(estimate = round(estimate * 100, 1))
+
+  title   <- dat$o_lab  %>% unique()
+  x_lab   <- dat$p_lab1 %>% unique()
+
+  plt <- bar_stacked(
+    dat             = dat,
+    x               = p_cat1,
+    y               = estimate,
+    fill            = o_cat,
+    x_lab           = x_lab,
+    y_lab           = "%",
+    fill_lab        = NULL,
+    title           = title,
+    base_size       = pptx_base_size,
+    legend_position = pptx_legend_position
+  )
+
+  list(plot = plt, base_size = get_base_string(dat))
+
+}
+
+
+# plot_median() ---------------------------------------------------------------
+# Aggregates a numeric outcome x predictor using weighted median and returns
+# a bar plot.
+
+plot_median <- function(outcome, predictor, data) {
+
+  dat <- calc_stats(
+    data       = data,
+    outcomes   = outcome,
+    predictors = list(predictor),
+    statistics = "w_median"
+  ) %>%
+    filter(cross_break == predictor)
+
+  title <- dat$o_lab  %>% unique()
+  x_lab <- dat$p_lab1 %>% unique()
+
+  plt <- bar(
+    dat       = dat,
+    x         = p_cat1,
+    y         = estimate,
+    x_lab     = x_lab,
+    y_lab     = "Median",
+    title     = title,
+    base_size = pptx_base_size
+  )
+
+  list(plot = plt, base_size = get_base_string(dat))
+
+}
+```
+
+<br>
+
+## Plots
+
+### Categorical outcomes
+
+```{r plots-cat, fig.height=4, fig.width=7}
+
+results_cat <- map(outcomes_cat, plot_stacked, predictor = crosstab, data = df_svy)
+walk(results_cat, \(x) print(x$plot))
+```
+
+<br>
+
+### Numeric outcomes
+
+```{r plots-num, fig.height=4, fig.width=7}
+
+results_num <- map(outcomes_num, plot_median, predictor = crosstab, data = df_svy)
+walk(results_num, \(x) print(x$plot))
+```
+
+<br>
+
+## Export
+
+```{r export}
+
+all_results <- c(results_cat, results_num)
+
+export_plots_to_pptx(
+  plot_list  = map(all_results, "plot"),
+  base_sizes = map(all_results, "base_size"),
+  filename   = here::here(paste0("7a_Outcomes by ", crosstab, ".pptx"))
+)
+```

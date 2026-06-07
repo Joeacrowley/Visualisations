@@ -18,6 +18,7 @@ book:
     - part: "Some simple functions"
       chapters:
         - 6_Bar_chart_function.qmd
+        - 7_Outcomes_by_predictor.qmd
 
 format:
   html:
