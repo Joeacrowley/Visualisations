@@ -217,6 +217,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Bar chart functions</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./7_Outcomes_by_predictor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Outcomes by predictor — worked example</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -290,23 +296,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">missing_text =</span> <span class="st">"Missing"</span>, </span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">statistic =</span> <span class="fu">list</span>(<span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean}"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="qlbmlynuyx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#qlbmlynuyx table {
+<div id="scwymlypxb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#scwymlypxb table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#qlbmlynuyx thead, #qlbmlynuyx tbody, #qlbmlynuyx tfoot, #qlbmlynuyx tr, #qlbmlynuyx td, #qlbmlynuyx th {
+#scwymlypxb thead, #scwymlypxb tbody, #scwymlypxb tfoot, #scwymlypxb tr, #scwymlypxb td, #scwymlypxb th {
   border-style: none;
 }
 
-#qlbmlynuyx p {
+#scwymlypxb p {
   margin: 0;
   padding: 0;
 }
 
-#qlbmlynuyx .gt_table {
+#scwymlypxb .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -332,12 +338,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_caption {
+#scwymlypxb .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#qlbmlynuyx .gt_title {
+#scwymlypxb .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -349,7 +355,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#qlbmlynuyx .gt_subtitle {
+#scwymlypxb .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -361,7 +367,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#qlbmlynuyx .gt_heading {
+#scwymlypxb .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -373,13 +379,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_bottom_border {
+#scwymlypxb .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_col_headings {
+#scwymlypxb .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -394,7 +400,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_col_heading {
+#scwymlypxb .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -414,7 +420,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#qlbmlynuyx .gt_column_spanner_outer {
+#scwymlypxb .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -426,15 +432,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#qlbmlynuyx .gt_column_spanner_outer:first-child {
+#scwymlypxb .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qlbmlynuyx .gt_column_spanner_outer:last-child {
+#scwymlypxb .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qlbmlynuyx .gt_column_spanner {
+#scwymlypxb .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -446,11 +452,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#qlbmlynuyx .gt_spanner_row {
+#scwymlypxb .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#qlbmlynuyx .gt_group_heading {
+#scwymlypxb .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -476,7 +482,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#qlbmlynuyx .gt_empty_group_heading {
+#scwymlypxb .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -491,15 +497,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#qlbmlynuyx .gt_from_md > :first-child {
+#scwymlypxb .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qlbmlynuyx .gt_from_md > :last-child {
+#scwymlypxb .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qlbmlynuyx .gt_row {
+#scwymlypxb .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -518,7 +524,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#qlbmlynuyx .gt_stub {
+#scwymlypxb .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -531,7 +537,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#qlbmlynuyx .gt_stub_row_group {
+#scwymlypxb .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -545,15 +551,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#qlbmlynuyx .gt_row_group_first td {
+#scwymlypxb .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#qlbmlynuyx .gt_row_group_first th {
+#scwymlypxb .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#qlbmlynuyx .gt_summary_row {
+#scwymlypxb .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -563,16 +569,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#qlbmlynuyx .gt_first_summary_row {
+#scwymlypxb .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_first_summary_row.thick {
+#scwymlypxb .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#qlbmlynuyx .gt_last_summary_row {
+#scwymlypxb .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -582,7 +588,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_grand_summary_row {
+#scwymlypxb .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -592,7 +598,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#qlbmlynuyx .gt_first_grand_summary_row {
+#scwymlypxb .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -602,7 +608,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_last_grand_summary_row_top {
+#scwymlypxb .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -612,11 +618,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_striped {
+#scwymlypxb .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#qlbmlynuyx .gt_table_body {
+#scwymlypxb .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -625,7 +631,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_footnotes {
+#scwymlypxb .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -639,7 +645,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_footnote {
+#scwymlypxb .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -648,7 +654,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#qlbmlynuyx .gt_sourcenotes {
+#scwymlypxb .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -662,7 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#qlbmlynuyx .gt_sourcenote {
+#scwymlypxb .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -670,72 +676,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#qlbmlynuyx .gt_left {
+#scwymlypxb .gt_left {
   text-align: left;
 }
 
-#qlbmlynuyx .gt_center {
+#scwymlypxb .gt_center {
   text-align: center;
 }
 
-#qlbmlynuyx .gt_right {
+#scwymlypxb .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qlbmlynuyx .gt_font_normal {
+#scwymlypxb .gt_font_normal {
   font-weight: normal;
 }
 
-#qlbmlynuyx .gt_font_bold {
+#scwymlypxb .gt_font_bold {
   font-weight: bold;
 }
 
-#qlbmlynuyx .gt_font_italic {
+#scwymlypxb .gt_font_italic {
   font-style: italic;
 }
 
-#qlbmlynuyx .gt_super {
+#scwymlypxb .gt_super {
   font-size: 65%;
 }
 
-#qlbmlynuyx .gt_footnote_marks {
+#scwymlypxb .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#qlbmlynuyx .gt_asterisk {
+#scwymlypxb .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#qlbmlynuyx .gt_indent_1 {
+#scwymlypxb .gt_indent_1 {
   text-indent: 5px;
 }
 
-#qlbmlynuyx .gt_indent_2 {
+#scwymlypxb .gt_indent_2 {
   text-indent: 10px;
 }
 
-#qlbmlynuyx .gt_indent_3 {
+#scwymlypxb .gt_indent_3 {
   text-indent: 15px;
 }
 
-#qlbmlynuyx .gt_indent_4 {
+#scwymlypxb .gt_indent_4 {
   text-indent: 20px;
 }
 
-#qlbmlynuyx .gt_indent_5 {
+#scwymlypxb .gt_indent_5 {
   text-indent: 25px;
 }
 
-#qlbmlynuyx .katex-display {
+#scwymlypxb .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#qlbmlynuyx div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#scwymlypxb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -868,7 +874,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="palettes" class="level2" data-number="6.2">
 <h2 data-number="6.2" class="anchored" data-anchor-id="palettes"><span class="header-section-number">6.2</span> Palettes</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>jcolours <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ncolours <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">blue   =</span> <span class="st">"#9397e1"</span>,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">pink   =</span> <span class="st">"#f381a6"</span>,</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">mint   =</span> <span class="st">"#36bba2"</span>,</span>
@@ -908,15 +914,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>      <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>jcolours<span class="sc">$</span>blue5</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>ncolours<span class="sc">$</span>blue5</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "#e7e3f8"</code></pre>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dump</span>(<span class="st">"jcolours"</span>, <span class="at">file =</span> <span class="st">"Scripts/colours.R"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dump</span>(<span class="st">"ncolours"</span>, <span class="at">file =</span> <span class="st">"Scripts/colours.R"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Review palette….</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>jcolours<span class="sc">$</span>colours_df <span class="sc">%&gt;%</span> unlist <span class="sc">%&gt;%</span> scales<span class="sc">::</span><span class="fu">show_col</span>(<span class="at">cex_label =</span> <span class="fl">0.8</span>, <span class="at">ncol =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ncolours<span class="sc">$</span>colours_df <span class="sc">%&gt;%</span> unlist <span class="sc">%&gt;%</span> scales<span class="sc">::</span><span class="fu">show_col</span>(<span class="at">cex_label =</span> <span class="fl">0.8</span>, <span class="at">ncol =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -950,7 +956,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>base <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(mpg, <span class="fu">aes</span>(cyl, displ, <span class="at">colour =</span> displ)) <span class="sc">+</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) </span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>base <span class="sc">+</span> <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> jcolours<span class="sc">$</span>colours_diverge_mint[<span class="dv">1</span>], <span class="at">high =</span> jcolours<span class="sc">$</span>colours_diverge_mint[<span class="dv">2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>base <span class="sc">+</span> <span class="fu">scale_color_gradient</span>(<span class="at">low =</span> ncolours<span class="sc">$</span>colours_diverge_mint[<span class="dv">1</span>], <span class="at">high =</span> ncolours<span class="sc">$</span>colours_diverge_mint[<span class="dv">2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -971,7 +977,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>bar1 <span class="ot">&lt;-</span> species <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> species, <span class="at">y =</span> species_percent, <span class="at">fill =</span> species)) <span class="sc">+</span> </span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> jcolours<span class="sc">$</span>colours10)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> ncolours<span class="sc">$</span>colours10)</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>bar1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
@@ -991,7 +997,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">island_percent =</span> <span class="dv">100</span> <span class="sc">*</span> (n<span class="sc">/</span> <span class="fu">sum</span>(n)))</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>bar2 <span class="ot">&lt;-</span> island <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> island, <span class="at">y =</span> island_percent)) <span class="sc">+</span> </span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> jcolours<span class="sc">$</span>blue3) </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> ncolours<span class="sc">$</span>blue3) </span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>bar2</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
@@ -1015,7 +1021,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_rev</span>(sex_island), <span class="at">y =</span> n, <span class="at">fill =</span> sex_island)) <span class="sc">+</span> </span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span> </span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> jcolours<span class="sc">$</span>colours_pairs)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> ncolours<span class="sc">$</span>colours_pairs)</span>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>bar5</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
@@ -1039,7 +1045,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bar4 <span class="ot">&lt;-</span> island_species <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> species, <span class="at">y =</span> sex_percent, <span class="at">fill =</span> sex)) <span class="sc">+</span> </span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span><span class="st">"dodge2"</span>) <span class="sc">+</span> </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> jcolours<span class="sc">$</span>colours_pairs) <span class="sc">+</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> ncolours<span class="sc">$</span>colours_pairs) <span class="sc">+</span> </span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>))</span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>bar4</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>

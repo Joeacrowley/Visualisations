@@ -65,6 +65,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./7_Outcomes_by_predictor.html" rel="next">
 <link href="./5_colours.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -216,6 +217,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Bar chart functions</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./7_Outcomes_by_predictor.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Outcomes by predictor — worked example</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
     </ul>
@@ -273,17 +280,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>df2 <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"synthetic_bsa_clean.rds"</span>))</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>df_svy <span class="ot">&lt;-</span> df2 <span class="sc">%&gt;%</span> <span class="fu">as_survey_design</span>(<span class="at">weights =</span> WtFactor)</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="do">## Load functions from Descriptives project on GitHub</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>scripts <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">fromJSON</span>(</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"https://api.github.com/repos/Joeacrowley/Descriptives/contents/Scripts"</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>r_scripts <span class="ot">&lt;-</span> scripts<span class="sc">$</span>download_url[<span class="fu">grepl</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">.R$"</span>, scripts<span class="sc">$</span>name, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>)]</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">quietly</span>(<span class="fu">lapply</span>(r_scripts, source))</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="do">## function (...) </span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="do">## capture_output(.f(...))</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x12c653ba0&gt;</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x12c6538c8&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"Scripts/colours.R"</span>))</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="do">## Load functions from Descriptives project on GitHub</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>scripts <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">fromJSON</span>(</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"https://api.github.com/repos/Joeacrowley/Descriptives/contents/Scripts"</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>r_scripts <span class="ot">&lt;-</span> scripts<span class="sc">$</span>download_url[<span class="fu">grepl</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">.R$"</span>, scripts<span class="sc">$</span>name, <span class="at">ignore.case =</span> <span class="cn">TRUE</span>)]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">quietly</span>(<span class="fu">lapply</span>(r_scripts, source))</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="do">## function (...) </span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="do">## capture_output(.f(...))</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;bytecode: 0x108b16408&gt;</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;environment: 0x108b168d8&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="philosophy" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="philosophy"><span class="header-section-number">7.1</span> Philosophy</h2>
@@ -323,289 +332,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="functions" class="level2" data-number="7.2">
 <h2 data-number="7.2" class="anchored" data-anchor-id="functions"><span class="header-section-number">7.2</span> Functions</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># wrap_text() -----------------------------------------------------------------</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Wraps a string to fit within a ggplot plot area.</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_width: estimated plot width in inches</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># num_labels: number of bars sharing the axis — defaults to 1, which makes</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#             this suitable for titles and axis labels as well as tick labels</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># char_width: approximate width of one character in inches — adjust for font size</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># margin:     proportion of plot width to treat as unusable</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>wrap_text <span class="ot">&lt;-</span> <span class="cf">function</span>(text, <span class="at">plot_width =</span> <span class="dv">7</span>, <span class="at">num_labels =</span> <span class="dv">1</span>, <span class="at">char_width =</span> <span class="fl">0.09</span>, <span class="at">margin =</span> <span class="fl">0.1</span>) {</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  usable_width <span class="ot">&lt;-</span> plot_width <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> margin)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  max_chars    <span class="ot">&lt;-</span> <span class="fu">floor</span>((usable_width <span class="sc">/</span> num_labels) <span class="sc">/</span> char_width)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_wrap</span>(text, <span class="at">width =</span> max_chars)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># resolve_y_lab() -------------------------------------------------------------</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Resolves y-axis label text and theme element based on label length.</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns a named list: y_lab_final and y_axis_theme.</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Short labels (&lt;=3 chars) are horizontal, longer labels are vertical and wrapped.</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>resolve_y_lab <span class="ot">&lt;-</span> <span class="cf">function</span>(y_lab, <span class="at">plot_height =</span> <span class="dv">4</span>) {</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(y_lab) <span class="sc">&amp;&amp;</span> <span class="fu">nchar</span>(y_lab) <span class="sc">&gt;</span> <span class="dv">3</span>) {</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">y_lab_final  =</span> <span class="fu">wrap_text</span>(y_lab, <span class="at">plot_width =</span> plot_height),</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">y_axis_theme =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(y_lab)) {</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">y_lab_final  =</span> y_lab,</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">y_axis_theme =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>)</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">y_lab_final  =</span> <span class="cn">NULL</span>,</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>      <span class="at">y_axis_theme =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>)</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co"># bar_width_from_n() ----------------------------------------------------------</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Scales bar width to the number of x-axis labels.</span></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="co"># Fewer bars get narrower widths to avoid them looking too fat.</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>bar_width_from_n <span class="ot">&lt;-</span> <span class="cf">function</span>(num_labels) {</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">case_when</span>(</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>    num_labels <span class="sc">&lt;=</span> <span class="dv">3</span> <span class="sc">~</span> <span class="fl">0.4</span>,</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>    num_labels <span class="sc">&lt;=</span> <span class="dv">5</span> <span class="sc">~</span> <span class="fl">0.6</span>,</span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>    num_labels <span class="sc">&lt;=</span> <span class="dv">8</span> <span class="sc">~</span> <span class="fl">0.75</span>,</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span>            <span class="sc">~</span> <span class="fl">0.9</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="co"># bar() -----------------------------------------------------------------------</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="co"># Bar chart for a single categorical x numeric variable.</span></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="co"># x:           unquoted name of the categorical column (ideally a factor) for the x-axis</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="co"># y:           unquoted name of the numeric column for the y-axis</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="co"># x_lab:       optional character string for the x-axis title</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lab:       optional character string for the y-axis title — if longer than 3</span></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="co">#              characters the label is rotated vertical and wrapped to plot height</span></span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="co"># title:       optional — left empty if not supplied</span></span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="co"># fill:        bar colour — "blue" (default), "softblue", "green", "orange"</span></span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_width:  estimated plot width in inches — used for label wrapping, default 7</span></span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_height: estimated plot height in inches — used for y-axis label wrapping</span></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="co">#              when the label is long, default 4</span></span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>bar <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, x, y, <span class="at">x_lab =</span> <span class="cn">NULL</span>, <span class="at">y_lab =</span> <span class="cn">NULL</span>, <span class="at">title =</span> <span class="cn">NULL</span>,</span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>                <span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">plot_width =</span> <span class="dv">7</span>, <span class="at">plot_height =</span> <span class="dv">4</span>) {</span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>  fill_options <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    <span class="at">blue     =</span> <span class="st">"#2E75B6"</span>,</span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">softblue =</span> <span class="st">"#5B9BD5"</span>,</span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    <span class="at">green    =</span> <span class="st">"#70AD47"</span>,</span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    <span class="at">orange   =</span> <span class="st">"#ED7D31"</span></span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>  fill <span class="ot">&lt;-</span> <span class="fu">match.arg</span>(fill, <span class="fu">names</span>(fill_options))</span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>  fill_colour <span class="ot">&lt;-</span> fill_options[[fill]]</span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>  x_var <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">substitute</span>(x))</span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>  y_var <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">substitute</span>(y))</span>
-<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>  x_lab_wrap <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(x_lab)) <span class="fu">wrap_text</span>(x_lab, <span class="at">plot_width =</span> plot_width) <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>  title_wrap <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(title)) <span class="fu">wrap_text</span>(title, <span class="at">plot_width =</span> plot_width) <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>  y_lab_resolved <span class="ot">&lt;-</span> <span class="fu">resolve_y_lab</span>(y_lab, plot_height)</span>
-<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>  y_lab_final    <span class="ot">&lt;-</span> y_lab_resolved<span class="sc">$</span>y_lab_final</span>
-<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>  y_axis_theme   <span class="ot">&lt;-</span> y_lab_resolved<span class="sc">$</span>y_axis_theme</span>
-<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>  num_labels <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">levels</span>(<span class="fu">fct_drop</span>(<span class="fu">as.factor</span>(dat[[x_var]]))))</span>
-<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>  bar_width  <span class="ot">&lt;-</span> <span class="fu">bar_width_from_n</span>(num_labels)</span>
-<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>  buffer <span class="ot">&lt;-</span> <span class="fu">mean</span>(dat[[y_var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="dv">4</span></span>
-<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>  ylim   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">ceiling</span>(<span class="fu">max</span>(dat[[y_var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> buffer))</span>
-<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>  dat <span class="sc">%&gt;%</span></span>
-<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var))) <span class="sc">%&gt;%</span></span>
-<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!!</span><span class="fu">sym</span>(x_var) <span class="sc">:</span><span class="er">=</span> <span class="fu">map_chr</span>(</span>
-<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.character</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var)),</span>
-<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>        wrap_text,</span>
-<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>        <span class="at">num_labels =</span> num_labels,</span>
-<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>        <span class="at">char_width =</span> <span class="fl">0.08</span></span>
-<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!!</span><span class="fu">sym</span>(x_var) <span class="sc">:</span><span class="er">=</span> <span class="fu">factor</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var), <span class="at">levels =</span> <span class="fu">unique</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var)))</span>
-<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span><span class="fu">sym</span>(x_var), <span class="at">y =</span> <span class="sc">!!</span><span class="fu">sym</span>(y_var))) <span class="sc">+</span></span>
-<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> fill_colour, <span class="at">width =</span> bar_width) <span class="sc">+</span></span>
-<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(<span class="sc">!!</span><span class="fu">sym</span>(y_var), <span class="dv">1</span>)), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">1.5</span>, <span class="at">size =</span> <span class="dv">11</span>, <span class="at">size.unit =</span> <span class="st">"pt"</span>) <span class="sc">+</span></span>
-<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
-<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
-<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> title_wrap,</span>
-<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>      <span class="at">x     =</span> x_lab_wrap,</span>
-<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>      <span class="at">y     =</span> y_lab_final</span>
-<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> ylim) <span class="sc">+</span></span>
-<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
-<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.margin  =</span> <span class="fu">margin</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.title   =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.title   =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.title.y =</span> y_axis_theme,</span>
-<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text.x  =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">b =</span> <span class="dv">10</span>), <span class="at">size =</span> <span class="dv">11</span>),</span>
-<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text.y  =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">l =</span> <span class="dv">10</span>), <span class="at">size =</span> <span class="dv">11</span>)</span>
-<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a><span class="co"># bar_clustered() -------------------------------------------------------------</span></span>
-<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a><span class="co"># Clustered bar chart for a categorical x numeric variable, grouped by a third</span></span>
-<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a><span class="co"># factor variable displayed as fill colour.</span></span>
-<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a><span class="co"># x:           unquoted name of the categorical column for the x-axis</span></span>
-<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a><span class="co"># y:           unquoted name of the numeric column for the y-axis</span></span>
-<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a><span class="co"># fill:        unquoted name of the grouping variable mapped to fill colour</span></span>
-<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a><span class="co"># x_lab:       optional character string for the x-axis title</span></span>
-<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lab:       optional character string for the y-axis title</span></span>
-<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a><span class="co"># fill_lab:    optional character string for the legend title</span></span>
-<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="co"># title:       optional — left empty if not supplied</span></span>
-<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a><span class="co"># palette:     RColorBrewer palette name for fill colours, default "Set2"</span></span>
-<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_width:  estimated plot width in inches — used for label wrapping, default 7</span></span>
-<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_height: estimated plot height in inches — used for y-axis label wrapping</span></span>
-<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a><span class="co">#              when the label is long, default 4</span></span>
-<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>bar_clustered <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, x, y, fill, <span class="at">x_lab =</span> <span class="cn">NULL</span>, <span class="at">y_lab =</span> <span class="cn">NULL</span>,</span>
-<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>                          <span class="at">fill_lab =</span> <span class="cn">NULL</span>, <span class="at">title =</span> <span class="cn">NULL</span>,</span>
-<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a>                          <span class="at">palette =</span> <span class="fu">c</span>(<span class="st">"Set2"</span>), <span class="at">plot_width =</span> <span class="dv">7</span>, <span class="at">plot_height =</span> <span class="dv">4</span>) {</span>
-<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>  x_var    <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">substitute</span>(x))</span>
-<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a>  y_var    <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">substitute</span>(y))</span>
-<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>  fill_var <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">substitute</span>(fill))</span>
-<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>  x_lab_wrap <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(x_lab)) <span class="fu">wrap_text</span>(x_lab, <span class="at">plot_width =</span> plot_width) <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>  title_wrap <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(title)) <span class="fu">wrap_text</span>(title, <span class="at">plot_width =</span> plot_width) <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>  y_lab_resolved <span class="ot">&lt;-</span> <span class="fu">resolve_y_lab</span>(y_lab, plot_height)</span>
-<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>  y_lab_final    <span class="ot">&lt;-</span> y_lab_resolved<span class="sc">$</span>y_lab_final</span>
-<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>  y_axis_theme   <span class="ot">&lt;-</span> y_lab_resolved<span class="sc">$</span>y_axis_theme</span>
-<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>  num_labels <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">levels</span>(<span class="fu">fct_drop</span>(<span class="fu">as.factor</span>(dat[[x_var]]))))</span>
-<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>  buffer <span class="ot">&lt;-</span> <span class="fu">mean</span>(dat[[y_var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="dv">4</span></span>
-<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>  ylim   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">ceiling</span>(<span class="fu">max</span>(dat[[y_var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> buffer))</span>
-<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>  dat <span class="sc">%&gt;%</span></span>
-<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var))) <span class="sc">%&gt;%</span></span>
-<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!!</span><span class="fu">sym</span>(x_var) <span class="sc">:</span><span class="er">=</span> <span class="fu">map_chr</span>(</span>
-<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.character</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var)),</span>
-<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>        wrap_text,</span>
-<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>        <span class="at">num_labels =</span> num_labels,</span>
-<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>        <span class="at">char_width =</span> <span class="fl">0.08</span></span>
-<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!!</span><span class="fu">sym</span>(x_var) <span class="sc">:</span><span class="er">=</span> <span class="fu">factor</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var), <span class="at">levels =</span> <span class="fu">unique</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var))),</span>
-<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!!</span><span class="fu">sym</span>(fill_var) <span class="sc">:</span><span class="er">=</span> <span class="fu">as.factor</span>(<span class="sc">!!</span><span class="fu">sym</span>(fill_var))</span>
-<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span><span class="fu">sym</span>(x_var), <span class="at">y =</span> <span class="sc">!!</span><span class="fu">sym</span>(y_var), <span class="at">fill =</span> <span class="sc">!!</span><span class="fu">sym</span>(fill_var))) <span class="sc">+</span></span>
-<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge2"</span>) <span class="sc">+</span></span>
-<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
-<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(<span class="sc">!!</span><span class="fu">sym</span>(y_var), <span class="dv">1</span>)),</span>
-<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>      <span class="at">position =</span> <span class="fu">position_dodge2</span>(<span class="fl">0.9</span>),</span>
-<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a>      <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">1.5</span>,</span>
-<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">11</span>,</span>
-<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a>      <span class="at">size.unit =</span> <span class="st">"pt"</span></span>
-<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> palette) <span class="sc">+</span></span>
-<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_linedraw</span>() <span class="sc">+</span></span>
-<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
-<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> title_wrap,</span>
-<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a>      <span class="at">x     =</span> x_lab_wrap,</span>
-<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>      <span class="at">y     =</span> y_lab_final,</span>
-<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>      <span class="at">fill  =</span> fill_lab</span>
-<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> ylim) <span class="sc">+</span></span>
-<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
-<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.margin  =</span> <span class="fu">margin</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.title   =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.title   =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.title.y =</span> y_axis_theme,</span>
-<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text.x  =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">b =</span> <span class="dv">10</span>), <span class="at">size =</span> <span class="dv">11</span>),</span>
-<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text.y  =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">l =</span> <span class="dv">10</span>), <span class="at">size =</span> <span class="dv">11</span>),</span>
-<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a>      <span class="at">legend.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a>      <span class="at">legend.position =</span> <span class="st">"bottom"</span></span>
-<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a><span class="co"># bar_stacked() ---------------------------------------------------------------</span></span>
-<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a><span class="co"># Stacked horizontal bar chart for a categorical x numeric variable,</span></span>
-<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a><span class="co"># grouped by a third factor variable displayed as fill colour.</span></span>
-<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a><span class="co"># x:           unquoted name of the categorical column for the x-axis</span></span>
-<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a><span class="co"># y:           unquoted name of the numeric column for the y-axis</span></span>
-<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a><span class="co"># fill:        unquoted name of the grouping variable mapped to fill colour</span></span>
-<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a><span class="co"># x_lab:       optional character string for the x-axis title</span></span>
-<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lab:       optional character string for the y-axis title</span></span>
-<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a><span class="co"># fill_lab:    optional character string for the legend title</span></span>
-<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a><span class="co"># title:       optional — left empty if not supplied</span></span>
-<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a><span class="co"># palette:     RColorBrewer palette name for fill colours, default "Set2"</span></span>
-<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_width:  estimated plot width in inches — used for label wrapping, default 7</span></span>
-<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_height: estimated plot height in inches — used for y-axis label wrapping,</span></span>
-<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a><span class="co">#              default 4</span></span>
-<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a>bar_stacked <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, x, y, fill, <span class="at">x_lab =</span> <span class="cn">NULL</span>, <span class="at">y_lab =</span> <span class="cn">NULL</span>,</span>
-<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a>                        <span class="at">fill_lab =</span> <span class="cn">NULL</span>, <span class="at">title =</span> <span class="cn">NULL</span>,</span>
-<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a>                        <span class="at">palette =</span> <span class="st">"Set2"</span>, <span class="at">plot_width =</span> <span class="dv">7</span>, <span class="at">plot_height =</span> <span class="dv">4</span>) {</span>
-<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a>  x_var    <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">substitute</span>(x))</span>
-<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a>  y_var    <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">substitute</span>(y))</span>
-<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a>  fill_var <span class="ot">&lt;-</span> <span class="fu">as.character</span>(<span class="fu">substitute</span>(fill))</span>
-<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a>  x_lab_wrap <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(x_lab)) <span class="fu">wrap_text</span>(x_lab, <span class="at">plot_width =</span> plot_width <span class="sc">*</span> <span class="fl">0.2</span>) <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a>  <span class="co"># x_lab_wrap &lt;- if (!is.null(x_lab)) wrap_text(x_lab, plot_width = plot_width) else NULL</span></span>
-<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a>  y_lab_wrap <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(y_lab)) <span class="fu">wrap_text</span>(y_lab, <span class="at">plot_width =</span> plot_width) <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a>  title_wrap <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(title)) <span class="fu">wrap_text</span>(title, <span class="at">plot_width =</span> plot_width) <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a>  num_labels <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">levels</span>(<span class="fu">fct_drop</span>(<span class="fu">as.factor</span>(dat[[x_var]]))))</span>
-<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a>  bar_width  <span class="ot">&lt;-</span> <span class="fu">bar_width_from_n</span>(num_labels)</span>
-<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a>  buffer <span class="ot">&lt;-</span> <span class="fu">mean</span>(dat[[y_var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="dv">4</span></span>
-<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a>  ylim   <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">ceiling</span>(<span class="fu">max</span>(dat[[y_var]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> buffer))</span>
-<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a>  dat <span class="sc">%&gt;%</span></span>
-<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var))) <span class="sc">%&gt;%</span></span>
-<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!!</span><span class="fu">sym</span>(x_var) <span class="sc">:</span><span class="er">=</span> <span class="fu">map_chr</span>(</span>
-<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.character</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var)),</span>
-<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a>        wrap_text,</span>
-<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a>        <span class="at">num_labels =</span> num_labels,</span>
-<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a>        <span class="at">char_width =</span> <span class="fl">0.08</span></span>
-<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!!</span><span class="fu">sym</span>(x_var) <span class="sc">:</span><span class="er">=</span> <span class="fu">factor</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var), <span class="at">levels =</span> <span class="fu">unique</span>(<span class="sc">!!</span><span class="fu">sym</span>(x_var))),</span>
-<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!!</span><span class="fu">sym</span>(fill_var) <span class="sc">:</span><span class="er">=</span> <span class="fu">as.factor</span>(<span class="sc">!!</span><span class="fu">sym</span>(fill_var))</span>
-<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span><span class="fu">sym</span>(x_var), <span class="at">y =</span> <span class="sc">!!</span><span class="fu">sym</span>(y_var), <span class="at">fill =</span> <span class="sc">!!</span><span class="fu">sym</span>(fill_var))) <span class="sc">+</span></span>
-<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"stack"</span>, <span class="at">width =</span> bar_width) <span class="sc">+</span></span>
-<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(</span>
-<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a>      <span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">round</span>(<span class="sc">!!</span><span class="fu">sym</span>(y_var), <span class="dv">1</span>)),</span>
-<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a>      <span class="at">position =</span> <span class="fu">position_stack</span>(<span class="at">vjust =</span> <span class="fl">0.5</span>),</span>
-<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a>      <span class="at">size =</span> <span class="dv">11</span>,</span>
-<span id="cb3-260"><a href="#cb3-260" aria-hidden="true" tabindex="-1"></a>      <span class="at">size.unit =</span> <span class="st">"pt"</span></span>
-<span id="cb3-261"><a href="#cb3-261" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb3-262"><a href="#cb3-262" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> palette) <span class="sc">+</span></span>
-<span id="cb3-263"><a href="#cb3-263" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb3-264"><a href="#cb3-264" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_gray</span>() <span class="sc">+</span></span>
-<span id="cb3-265"><a href="#cb3-265" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
-<span id="cb3-266"><a href="#cb3-266" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> title_wrap,</span>
-<span id="cb3-267"><a href="#cb3-267" aria-hidden="true" tabindex="-1"></a>      <span class="at">x     =</span> x_lab_wrap,</span>
-<span id="cb3-268"><a href="#cb3-268" aria-hidden="true" tabindex="-1"></a>      <span class="at">y     =</span> y_lab_wrap,</span>
-<span id="cb3-269"><a href="#cb3-269" aria-hidden="true" tabindex="-1"></a>      <span class="at">fill  =</span> fill_lab</span>
-<span id="cb3-270"><a href="#cb3-270" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
-<span id="cb3-271"><a href="#cb3-271" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(</span>
-<span id="cb3-272"><a href="#cb3-272" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.margin  =</span> <span class="fu">margin</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb3-273"><a href="#cb3-273" aria-hidden="true" tabindex="-1"></a>      <span class="at">plot.title   =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">13</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-274"><a href="#cb3-274" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.title   =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-275"><a href="#cb3-275" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-276"><a href="#cb3-276" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text.x  =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">b =</span> <span class="dv">10</span>), <span class="at">size =</span> <span class="dv">11</span>),</span>
-<span id="cb3-277"><a href="#cb3-277" aria-hidden="true" tabindex="-1"></a>      <span class="at">axis.text.y  =</span> <span class="fu">element_text</span>(<span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">l =</span> <span class="dv">10</span>), <span class="at">size =</span> <span class="dv">11</span>),</span>
-<span id="cb3-278"><a href="#cb3-278" aria-hidden="true" tabindex="-1"></a>      <span class="at">legend.title     =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
-<span id="cb3-279"><a href="#cb3-279" aria-hidden="true" tabindex="-1"></a>      <span class="at">legend.position  =</span> <span class="st">"bottom"</span>,</span>
-<span id="cb3-280"><a href="#cb3-280" aria-hidden="true" tabindex="-1"></a>      <span class="at">legend.direction =</span> <span class="st">"horizontal"</span></span>
-<span id="cb3-281"><a href="#cb3-281" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-282"><a href="#cb3-282" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-283"><a href="#cb3-283" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"Scripts/bar_charts.R"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><br></p>
 </section>
@@ -631,14 +358,14 @@ $ cross_break      &lt;chr&gt; "Total", "Total", "Total", "Total", "Total"</code
 </div>
 </div>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Basic</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Orange</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">y-axis label</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href="">Lib-auth scale</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false" href="">Clustered bar</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false" href="">Other palettes</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-7" role="tab" aria-controls="tabset-2-7" aria-selected="false" href="">Stacked plots</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">Basic</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">Orange</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false" href="">y-axis label</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false" href="">Lib-auth scale</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-5" role="tab" aria-controls="tabset-3-5" aria-selected="false" href="">Clustered bar</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-6" role="tab" aria-controls="tabset-3-6" aria-selected="false" href="">Other palettes</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-7" role="tab" aria-controls="tabset-3-7" aria-selected="false" href="">Stacked plots</a></li></ul>
 <div class="tab-content">
-<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bar</span>(<span class="at">dat =</span> data_frame <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">estimate =</span> estimate <span class="sc">*</span> <span class="dv">100</span>), </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> o_cat, </span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> estimate, </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"softblue"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> ncolours<span class="sc">$</span>blue2,</span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x_lab =</span> data_frame<span class="sc">$</span>o_lab <span class="sc">%&gt;%</span> unique, </span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_lab =</span> <span class="st">"%"</span>, </span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="cn">NULL</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -651,12 +378,12 @@ $ cross_break      &lt;chr&gt; "Total", "Total", "Total", "Total", "Total"</code
 </div>
 </div>
 </div>
-<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bar</span>(<span class="at">dat =</span> data_frame <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">estimate =</span> estimate <span class="sc">*</span> <span class="dv">100</span>), </span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> o_cat, </span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> estimate, </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"orange"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> ncolours<span class="sc">$</span>orange1,</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x_lab =</span> data_frame<span class="sc">$</span>o_lab <span class="sc">%&gt;%</span> unique, </span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y_lab =</span> <span class="st">"Percentage"</span>, </span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Plot of sorts"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -669,7 +396,7 @@ $ cross_break      &lt;chr&gt; "Total", "Total", "Total", "Total", "Total"</code
 </div>
 </div>
 </div>
-<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bar</span>(<span class="at">dat =</span> data_frame <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">estimate =</span> estimate <span class="sc">*</span> <span class="dv">100</span>), </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> o_cat, </span>
@@ -685,7 +412,7 @@ $ cross_break      &lt;chr&gt; "Total", "Total", "Total", "Total", "Total"</code
 </div>
 </div>
 </div>
-<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>(data_frame2 <span class="ot">&lt;-</span> <span class="fu">calc_stats</span>(</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df2, </span>
@@ -741,7 +468,7 @@ $ p_value          &lt;lgl&gt; NA, NA, NA</code></pre>
 </div>
 </div>
 </div>
-<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<div id="tabset-3-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-5-tab">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -811,111 +538,79 @@ $ welfare3  &lt;fct&gt; NA, NA, 2.5 to 3.5, 2.5 to 3.5, 2.5 to 3.5, Up to 2.5, U
 </div>
 <p><br></p>
 </div>
-<div id="tabset-2-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-6-tab">
-<p>Not sure about any of these really.</p>
+<div id="tabset-3-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-6-tab">
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Set2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Set1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Dark2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Paired</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">RdBu</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false" href="">PuOr</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-7" role="tab" aria-controls="tabset-1-7" aria-selected="false" href="">RdYlGn</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-8-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-8" role="tab" aria-controls="tabset-1-8" aria-selected="false" href="">Blues</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-9-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-9" role="tab" aria-controls="tabset-1-9" aria-selected="false" href="">YlOrRd</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">colours_pairs</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">colours10</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">blues</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">mints</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">oranges</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid" width="672"></p>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-3.png" class="img-fluid" width="672"></p>
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-4.png" class="img-fluid" width="672"></p>
+<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid" width="672"></p>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-5.png" class="img-fluid" width="672"></p>
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-6.png" class="img-fluid" width="672"></p>
+<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-3.png" class="img-fluid" width="672"></p>
 </div>
 <div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-7.png" class="img-fluid" width="672"></p>
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-8.png" class="img-fluid" width="672"></p>
+<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-4.png" class="img-fluid" width="672"></p>
 </div>
 <div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-9.png" class="img-fluid" width="672"></p>
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-10.png" class="img-fluid" width="672"></p>
-</div>
-<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-11.png" class="img-fluid" width="672"></p>
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-12.png" class="img-fluid" width="672"></p>
-</div>
-<div id="tabset-1-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-7-tab">
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-13.png" class="img-fluid" width="672"></p>
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-14.png" class="img-fluid" width="672"></p>
-</div>
-<div id="tabset-1-8" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-8-tab">
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-15.png" class="img-fluid" width="672"></p>
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-16.png" class="img-fluid" width="672"></p>
-</div>
-<div id="tabset-1-9" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-9-tab">
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-17.png" class="img-fluid" width="672"></p>
-<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-18.png" class="img-fluid" width="672"></p>
+<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-10-5.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </div>
 <p><br></p>
 </div>
-<div id="tabset-2-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-7-tab">
-<p><br></p>
+<div id="tabset-3-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-7-tab">
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Legend bottom</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Legend right</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>bar_stacked</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>function (dat, x, y, fill, x_lab = NULL, y_lab = NULL, fill_lab = NULL, 
-    title = NULL, palette = "Set2", plot_width = 7, plot_height = 4) 
-{
-    x_var &lt;- as.character(substitute(x))
-    y_var &lt;- as.character(substitute(y))
-    fill_var &lt;- as.character(substitute(fill))
-    x_lab_wrap &lt;- if (!is.null(x_lab)) 
-        wrap_text(x_lab, plot_width = plot_width * 0.2)
-    else NULL
-    y_lab_wrap &lt;- if (!is.null(y_lab)) 
-        wrap_text(y_lab, plot_width = plot_width)
-    else NULL
-    title_wrap &lt;- if (!is.null(title)) 
-        wrap_text(title, plot_width = plot_width)
-    else NULL
-    num_labels &lt;- length(levels(fct_drop(as.factor(dat[[x_var]]))))
-    bar_width &lt;- bar_width_from_n(num_labels)
-    buffer &lt;- mean(dat[[y_var]], na.rm = TRUE)/4
-    ylim &lt;- c(0, ceiling(max(dat[[y_var]], na.rm = TRUE) + buffer))
-    dat %&gt;% filter(!is.na(!!sym(x_var))) %&gt;% mutate(`:=`(!!sym(x_var), 
-        map_chr(as.character(!!sym(x_var)), wrap_text, num_labels = num_labels, 
-            char_width = 0.08)), `:=`(!!sym(x_var), factor(!!sym(x_var), 
-        levels = unique(!!sym(x_var)))), `:=`(!!sym(fill_var), 
-        as.factor(!!sym(fill_var)))) %&gt;% ggplot(aes(x = !!sym(x_var), 
-        y = !!sym(y_var), fill = !!sym(fill_var))) + geom_col(position = "stack", 
-        width = bar_width) + geom_text(aes(label = round(!!sym(y_var), 
-        1)), position = position_stack(vjust = 0.5), size = 11, 
-        size.unit = "pt") + scale_fill_brewer(palette = palette) + 
-        coord_flip() + theme_gray() + labs(title = title_wrap, 
-        x = x_lab_wrap, y = y_lab_wrap, fill = fill_lab) + theme(plot.margin = margin(1, 
-        1, 1, 1), plot.title = element_text(size = 13, face = "bold"), 
-        axis.title = element_text(size = 11, face = "bold"), 
-        axis.title.y = element_text(angle = 0, vjust = 0.5, size = 11, 
-            face = "bold"), axis.text.x = element_text(margin = margin(b = 10), 
-            size = 11), axis.text.y = element_text(margin = margin(l = 10), 
-            size = 11), legend.title = element_text(size = 11, 
-            face = "bold"), legend.position = "bottom", legend.direction = "horizontal")
-}</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bar_stacked</span>(</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">dat =</span> data_frame3, </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="st">"p_cat1"</span>,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fill =</span> <span class="st">"o_cat"</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="st">"estimate"</span>, </span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">x_lab =</span> data_frame3<span class="sc">$</span>p_lab1 <span class="sc">%&gt;%</span> unique <span class="sc">%&gt;%</span> <span class="fu">grep</span>(<span class="st">"Total"</span>, ., <span class="at">value =</span> T, <span class="at">invert =</span> T),</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">y_lab =</span> <span class="st">"%"</span>, </span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">fill_lab =</span> data_frame3<span class="sc">$</span>o_lab <span class="sc">%&gt;%</span> unique, </span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">title =</span> <span class="st">"Left right scale, crosstabulated by sex"</span>, </span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">palette =</span> <span class="st">"Set2"</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bar_stacked</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">dat             =</span> data_frame3,</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x               =</span> <span class="st">"p_cat1"</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fill            =</span> <span class="st">"o_cat"</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">y               =</span> <span class="st">"estimate"</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">x_lab           =</span> data_frame3<span class="sc">$</span>p_lab1 <span class="sc">%&gt;%</span> unique <span class="sc">%&gt;%</span> <span class="fu">grep</span>(<span class="st">"Total"</span>, ., <span class="at">value =</span> T, <span class="at">invert =</span> T),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">y_lab           =</span> <span class="st">"%"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">fill_lab        =</span> data_frame3<span class="sc">$</span>o_lab <span class="sc">%&gt;%</span> unique,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">title           =</span> <span class="st">"Left right scale, crosstabulated by sex"</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">title_size      =</span> <span class="dv">14</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend_position =</span> <span class="st">"bottom"</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>Best for long response labels — each label gets the full legend column width.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bar_stacked</span>(</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">dat             =</span> data_frame3,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x               =</span> <span class="st">"p_cat1"</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fill            =</span> <span class="st">"o_cat"</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">y               =</span> <span class="st">"estimate"</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">x_lab           =</span> data_frame3<span class="sc">$</span>p_lab1 <span class="sc">%&gt;%</span> unique <span class="sc">%&gt;%</span> <span class="fu">grep</span>(<span class="st">"Total"</span>, ., <span class="at">value =</span> T, <span class="at">invert =</span> T),</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">y_lab           =</span> <span class="st">"%"</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">fill_lab        =</span> <span class="cn">NULL</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">title           =</span> <span class="st">"Left right scale, crosstabulated by sex"</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">title_size      =</span> <span class="dv">14</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend_position =</span> <span class="st">"right"</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="6_Bar_chart_function_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -1334,6 +1029,9 @@ $ welfare3  &lt;fct&gt; NA, NA, 2.5 to 3.5, 2.5 to 3.5, 2.5 to 3.5, Up to 2.5, U
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./7_Outcomes_by_predictor.html" class="pagination-link" aria-label="Outcomes by predictor — worked example">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Outcomes by predictor — worked example</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->
