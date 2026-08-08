@@ -1,0 +1,41 @@
+{
+  "index.qmd": {
+    "index.html": "c610810e"
+  },
+  "1_ggplot basics.qmd": {
+    "1_ggplot basics.html": "7af45423"
+  },
+  "2_Colours.qmd": {
+    "2_Colours.html": "afe17ec1"
+  },
+  "3_ggplot themes.qmd": {
+    "3_ggplot themes.html": "a8c2f0fe"
+  },
+  "4_Bar charts.qmd": {
+    "4_Bar charts.html": "d8c78863"
+  },
+  "1_ggplot_basics.qmd": {
+    "1_ggplot_basics.html": "f9cc80e8"
+  },
+  "2_colours.qmd": {
+    "2_colours.html": "4ccdae8c"
+  },
+  "3_ggplot_themes.qmd": {
+    "3_ggplot_themes.html": "fa7ee48d"
+  },
+  "4_bar_charts.qmd": {
+    "4_bar_charts.html": "3eadf7c9"
+  },
+  "5_Bar_chart_function.qmd": {
+    "5_Bar_chart_function.html": "f01e12e0"
+  },
+  "5_colours.qmd": {
+    "5_colours.html": "0fc937de"
+  },
+  "6_Bar_chart_function.qmd": {
+    "6_Bar_chart_function.html": "ff4ac4be"
+  },
+  "7_Outcomes_by_predictor.qmd": {
+    "7_Outcomes_by_predictor.html": "39052896"
+  }
+}
