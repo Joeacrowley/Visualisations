@@ -1,0 +1,104 @@
+---
+title: "Line chart summary function"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(dtab)
+library(visu)
+```
+
+<br>
+
+```{r data}
+survey = MASS::survey
+survey%>%glimpse
+```
+
+<br>
+
+```{r}
+
+dat <- survey %>% 
+  
+  mutate(age = factor(round(Age))) %>%
+  
+  calc_stats(
+    outcomes = c("Wr.Hnd", "NW.Hnd"), 
+    predictors = "age", 
+    statistics = "mean") %>%  filter(p_cat1 != "Total") 
+  
+n_lines <- dat$o_lab%>%unique%>%length()
+
+dat %>% ggplot(aes(x = p_cat1, 
+             y = estimate, 
+             group = o_lab, 
+             color = o_lab, 
+             linetype = o_lab
+             )
+         ) + 
+  geom_line() +  
+  theme_house() + 
+  scale_colour_pal_categorical(n = n_lines, primary = 2)
+
+?scale_Col
+
+```
+
+
+
+
+
+```{r}
+line_by <- function(data, outcomes, predictor, statistics = "mean",
+                     x_lab = NULL, y_lab = NULL, group_lab = NULL, title = NULL,
+                     base_size = 11, colour_family = NULL, colour = "blue1") {
+
+  stopifnot(length(statistics) == 1)
+
+  dat <- calc_stats(data, outcomes = outcomes, predictors = predictor,
+                     statistics = statistics) %>%
+    filter(cross_break != "Total")
+
+  num_groups <- length(unique(dat$o_lab))
+
+  colour_scale <- if (!is.null(colour)) {
+    scale_colour_manual(values = rep(resolve_pal_colour(colour), num_groups))
+  } else if (is.null(colour_family)) {
+    scale_colour_pal_categorical(n = num_groups)
+  } else {
+    scale_colour_pal_sequential(family = colour_family, n = num_groups)
+  }
+
+  chart_x_lab <- if (is.null(x_lab)) dat$p_lab1[1] else x_lab
+  chart_y_lab <- if (is.null(y_lab)) statistics else ylab
+
+  dat %>%
+    ggplot(aes(x = p_cat1, y = estimate, group = o_lab, colour = o_lab, linetype = o_lab)) +
+    geom_line(linewidth = 0.7) +
+    theme_house(base_size = base_size) +
+    colour_scale +
+    labs(title = title, x = chart_x_lab, y = chart_y_lab, colour = group_lab, linetype = group_lab)
+}
+
+line_by(survey %>% mutate(age = factor(round(Age))),
+        outcomes = c("Wr.Hnd", "NW.Hnd"), predictor = "age", 
+        colour = NULL)
+
+line_by(survey %>% mutate(age = factor(round(Age))),
+        outcomes = c("Wr.Hnd", "NW.Hnd"), predictor = "age", 
+        colour = "grey4", statistics = "median")
+
+```
+
+
+
+
+
+
+
+
+

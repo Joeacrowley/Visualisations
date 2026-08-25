@@ -1,0 +1,75 @@
+---
+title: "Clustered bar charts"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(visu)
+```
+
+### How bar_clustered() works
+
+Same idea as `bar()`, but for two categorical variables at once: `x` groups bars along the axis, `fill` groups bars side by side within each `x` group (`position = "dodge2"`). Colours come from `nc_alt1` via `scale_fill_pal_categorical()`, sized automatically to `fill`'s number of levels — no `fill` colour argument to set directly, unlike `bar()`.
+
+-   `dat` — the data frame, one row per x/fill combination
+-   `x` — unquoted column name for the axis grouping
+-   `y` — unquoted column name for the already-computed value each bar shows
+-   `fill` — unquoted column name for the within-group colour grouping
+-   `x_lab` / `y_lab` / `fill_lab` — optional axis/legend titles
+-   `title` — optional plot title
+-   `base_size` — base font size, via `theme_house()`
+-   `horiz` — `FALSE` (default) for upright bars, `TRUE` to flip horizontal - done by swapping which column maps to the x/y aesthetic, not `coord_flip()` (see `9_basic_bar_charts.qmd`)
+-   `label_digits` — decimal places on each bar's value label, default 1
+-   `label_size` — font size for value labels, default `NULL` (falls back to `base_size`), independent of it
+-   `label_style` — `"normal"` (default), `"suppress"` (no value labels), or `"diag"` (labels at 45 degrees)
+-   `fill_family` — `NULL` (default) colours `fill` categorically, spread across `nc_alt1` families (`scale_fill_pal_categorical()`); set to a family name (e.g. `"mint"`) to colour it sequentially within that one family instead (`scale_fill_pal_sequential()`) - suited to an ordered `fill` variable, no cap on levels
+-   `plot_width` / `plot_height` — feed label-wrapping maths only, not the plot's actual rendered size (see `9_basic_bar_charts.qmd` for the fuller explanation)
+
+`diamonds` `cut`/`color` rather than `2_geom_gallery.qmd`'s `class`/`drv` — that pairing is too sparse to show clustering properly (several classes only have one drivetrain in the data at all, so most "clusters" are really just one bar). Every `cut`/`color` combination is well populated, so each cluster actually shows the full comparison.
+
+```{r}
+diamonds_cut_colour <- diamonds %>% count(cut, color)
+
+bar_clustered(diamonds_cut_colour, cut, n, color, title = "Diamonds by cut and colour", fill_lab = "Colour")
+```
+
+### The overlap problem, and fixing it
+
+With 7 `color` levels dodged inside each `cut` group, the bars get narrow but the value labels stay at `base_size` regardless, so the numbers collide with their neighbours - visible above. `label_size` and `label_digits` are the direct fix: shrinking the label font gives it room to fit, and dropping the decimal (`n` is a whole-number count, so ".0" is pure wasted width) shortens the text on top of that.
+
+```{r}
+bar_clustered(diamonds_cut_colour, cut, n, color, title = "Diamonds by cut and colour", fill_lab = "Colour", label_size = 6, label_digits = 0)
+```
+
+If that's still too tight, `label_style = "suppress"` drops the value labels altogether and leans on the axis/legend instead - a reasonable call once a chart is dense enough that no label size survives gracefully.
+
+```{r}
+bar_clustered(diamonds_cut_colour, cut, n, color, title = "Diamonds by cut and colour", fill_lab = "Colour", label_style = "suppress")
+```
+
+### horiz
+
+Flips to horizontal bars - each `cut` category gets its own row, so the 7 dodged `color` bars within it have more room top-to-bottom rather than competing for width.
+
+```{r}
+bar_clustered(diamonds_cut_colour, cut, n, color, title = "Diamonds by cut and colour", fill_lab = "Colour", horiz = TRUE, label_size = 6, label_digits = 0)
+```
+
+### label_style = "diag"
+
+Rotates the value labels 45 degrees instead - an alternative to shrinking them, for the upright case.
+
+```{r}
+bar_clustered(diamonds_cut_colour, cut, n, color, title = "Diamonds by cut and colour", fill_lab = "Colour", label_style = "diag", label_digits = 0, label_size = 8)
+```
+
+### fill_family
+
+`color` is itself ordered (D best through J worst), so a one-hue sequential ramp (`scale_fill_pal_sequential()` under the hood) carries that ordering in the colour itself, rather than spreading across families the way the categorical default does. 7 levels is past the 5 discrete shades one family has, so this draws on the interpolated branch.
+
+```{r}
+bar_clustered(diamonds_cut_colour, cut, n, color, title = "Diamonds by cut and colour", fill_lab = "Colour", fill_family = "purple", label_size = 6, label_digits = 0)
+```

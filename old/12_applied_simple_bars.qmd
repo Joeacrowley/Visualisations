@@ -1,0 +1,345 @@
+---
+title: "Bar chart summary function"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(dtab)
+
+source("scripts/theme_house.R")
+source("scripts/nc_alt1.R")
+source("visu/bar_charts.R")
+```
+
+<br>
+```{r data}
+survey = MASS::survey
+survey%>%glimpse
+```
+
+<br>
+
+## Categorical var (totals)
+
+```{r bar_cat}
+
+bar_cat <- function(outcome, data, statistics = c("count"), # Can be "perc" 
+                    title = NULL, horiz = F, fill = "pink") {
+
+  dat <- calc_stats(
+    data       = data,
+    outcomes   = outcome,
+    statistics = statistics
+  ) 
+  
+  if(statistics == "perc"){dat$estimate <- dat$estimate * 100}
+
+  x_lab <- dat$o_lab %>% unique()
+
+  plt <- bar(
+    dat       = dat,
+    x         = o_cat,
+    y         = estimate,
+    x_lab     = x_lab,
+    y_lab     = ifelse(statistics %in% "perc", "%", "Count"),
+    title     = title, 
+    fill = fill,
+    horiz = horiz
+  )
+
+  plt
+
+}
+
+bar_cat(data = survey, outcome = "Smoke", statistics = "perc", title = "Smoking habit among the students", fill = "grey4")
+bar_cat(data = survey, outcome = "Smoke", statistics = "count", title = "Smoking habit among the students", horiz = T)
+
+```
+
+<br>
+
+# Numeric vars (totals)
+
+```{r}
+
+bar_num <- function(outcomes, data, statistics = c("median"), # can be "mean"
+                    title = NULL, horiz = F, fill = "pink", 
+                    x_lab = NULL) {
+
+  stopifnot(length(statistics) == 1)
+  
+  dat <- calc_stats(
+    data       = data,
+    outcomes   = outcomes,
+    statistics = statistics
+  ) 
+
+  plt <- bar(
+    dat       = dat,
+    x         = o_lab,
+    y         = estimate,
+    x_lab     = x_lab,
+    y_lab     = ifelse(statistics %in% "mean", "Mean", "Median"),
+    title     = title, 
+    fill = fill,
+    horiz = horiz
+  )
+
+  plt
+
+}
+
+bar_num(data = survey, outcomes = c("Pulse", "Height", "Age"), title = "All numeric vars", 
+        x_lab = "These are different variables, see?")
+
+bar_num(data = survey, outcomes = c("Pulse", "Height", "Age"), title = "All numeric vars", 
+        x_lab = "These are different variables, see?", 
+        statistics = "mean")
+```
+
+<br>
+
+```{r, error=T}
+bar_num(data = survey, outcomes = c("Pulse", "Height", "Age"), title = "All numeric vars", 
+        x_lab = "These are different variables, see?", 
+        statistics = c("mean", "median"))
+```
+
+<br>
+
+## Numeric var (crossbreak)
+
+```{r}
+
+bar_num_by <- 
+  function(
+      outcome, 
+      predictor,
+      data, 
+      statistics = c("median"), # can be "mean"
+      title = NULL, 
+      horiz = F, 
+      fill = "pink",
+      show_total = T
+      ) {
+
+  stopifnot(length(statistics) == 1)
+  
+  dat <- calc_stats(
+    data       = data,
+    outcome    = outcome,
+    predictors = predictor,
+    statistics = statistics
+  ) 
+  
+  if(show_total==F){dat <- dat %>% filter(p_cat1 != "Total")}
+  x_lab <- dat$p_lab1 %>% grep("Total", ., value = T, invert = T) %>% unique()
+  
+  plt <- bar(
+    dat       = dat,
+    x         = p_cat1,
+    y         = estimate,
+    x_lab     = x_lab,
+    y_lab     = ifelse(statistics %in% "mean", "Mean", "Median"),
+    title     = title, 
+    fill = fill,
+    horiz = horiz
+  )
+
+  plt
+
+  }
+
+bar_num_by(data = survey, outcome = c("Pulse"), predictor = "Smoke",
+           title = "All numeric vars", 
+           statistics = c("mean"), fill = "mint2"
+           )
+
+bar_num_by(data = survey, outcome = c("Pulse"), predictor = "Exer",
+           title = "All numeric vars", 
+           statistics = c("mean"), fill = "mint2",
+           horiz = T, show_total = F) 
+
+```
+
+<br>
+
+## Categorical var (crossbreak - stack)
+
+```{r}
+
+bar_cat_by <- function(outcome, predictor, data, statistics = c("perc"), # Can be "count" 
+                    title = NULL, horiz = F, fill_family = NULL, show_total = T) {
+
+  stopifnot(length(statistics) == 1)
+
+  dat <- calc_stats(
+    data       = data,
+    outcomes   = outcome,
+    predictors = predictor,
+    statistics = statistics
+  ) 
+  
+  if(show_total==F){dat <- dat %>% filter(p_cat1 != "Total")}
+  if(statistics == "perc"){dat$estimate <- dat$estimate * 100}
+  x_lab <- dat$p_lab1 %>% grep("Total", ., value = T, invert = T) %>% unique()
+  
+  bar_stacked(dat = dat, 
+              x = p_cat1, 
+              y = estimate,
+              fill = o_cat,
+              fill_family = fill_family,
+              x_lab = x_lab,
+              y_lab = ifelse(statistics %in% "perc", "%", "Count"),
+              title = title,
+              horiz = horiz
+  )
+}
+
+bar_cat_by(data = survey, predictor = "Sex", outcome = "Smoke")
+bar_cat_by(data = survey, predictor = "Sex", outcome = "Clap", 
+          horiz = T, fill_family = "blue", show_total = F
+          )
+
+
+```
+
+## Categorical var (crossbreak - cluster)
+
+```{r}
+
+bar_cat_by2 <- function(
+    outcome, 
+    predictor, 
+    data, 
+    statistics = c("perc"), # Can be "count"
+    title = NULL, 
+    horiz = F, 
+    fill_family = NULL, 
+    show_total = T) {
+
+  stopifnot(length(statistics) == 1)
+
+  dat <- calc_stats(
+    data       = data,
+    outcomes   = outcome,
+    predictors = predictor,
+    statistics = statistics
+  ) 
+  
+  if(show_total==F){dat <- dat %>% filter(p_cat1 != "Total")}
+  if(statistics == "perc"){dat$estimate <- dat$estimate * 100}
+  x_lab <- dat$p_lab1 %>% grep("Total", ., value = T, invert = T) %>% unique()
+  
+  bar_clustered(dat = dat, 
+              x = p_cat1, 
+              y = estimate,
+              fill = o_cat,
+              fill_family = fill_family,
+              x_lab = x_lab,
+              y_lab = ifelse(statistics %in% "perc", "%", "Count"),
+              title = title,
+              horiz = horiz
+  )
+}
+
+bar_cat_by2(data = survey, predictor = "Sex", outcome = "Smoke")
+bar_cat_by(data = survey, predictor = "Sex", outcome = "Clap", 
+          horiz = T, fill_family = "blue", show_total = F
+          )
+
+```
+
+<br>
+
+```{r}
+
+y_fill_expr <- sym("n")
+
+rlang::inject(
+    survey %>% count(Sex) %>% 
+      bar(x = Sex, y = !!y_fill_expr)
+    )
+
+y_fill_expr == n
+
+```
+
+```{r}
+
+bar_by <- function(
+    data, 
+    outcome, 
+    predictor = NULL, 
+    cluster = F,
+    statistics = c("perc"), # Can be "count"
+    title = NULL, 
+    horiz = F, 
+    fill_family = NULL, 
+    show_total = T
+    ) {
+  
+  stopifnot(length(statistics) == 1)
+  
+  if(statistics %in% c("mean", "median")){
+    chart_type = "num"} else {chart_type = "cat"}
+  
+    dat <- 
+      calc_stats(
+        data       = data,
+        outcomes   = outcome,
+        predictors = predictor,
+        statistics = statistics
+        ) 
+  
+  if(chart_type == "num" & is.null(predictor)){
+    
+    chart_func <- bar
+    x_arg <- sym("o_lab")
+
+  } else if (chart_type == "cat" & is.null(predictor)){
+    
+    chart_func <- bar
+    x_arg <- sym("o_cat")
+    x_lab_arg <- sym("o_lab")
+  
+  } else if (chart_type == "num" & !is.null(predictor)){
+    
+    chart_func <- bar
+  
+  } else if (chart_type == "cat" & !is.null(predictor) & cluster == F){
+    
+    chart_func <- bar_stacked
+  
+  } else {chart_func <- bar_clustered}
+    
+  if(!is.null(predictor)){
+    x_arg <- sym("p_cat1")
+    x_lab_arg <- dat$p_lab1 %>% grep("Total", ., value = T, invert = T) %>% unique()
+  }  
+  
+  if(show_total==F & !is.null(predictor)){dat <- dat %>% filter(p_cat1 != "Total")}
+  if(statistics == "perc"){dat$estimate <- dat$estimate * 100}
+
+  chart_func(dat = dat, 
+              x = x_arg, 
+              y = estimate,
+              fill = o_cat,
+              fill_family = fill_family,
+              x_lab = x_lab,
+              y_lab = ifelse(statistics %in% "perc", "%", "Count"),
+              title = title,
+              horiz = horiz
+  )
+}
+
+```
+
+
+
+
+
+

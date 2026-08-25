@@ -1,0 +1,55 @@
+---
+title: "Histogram function"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(dtab)
+library(visu)
+```
+
+<br>
+
+```{r data}
+survey = MASS::survey
+survey%>%glimpse
+```
+
+<br>
+
+```{r}
+
+survey %>% 
+  filter(!is.na(Wr.Hnd)) %>% 
+  ggplot() +
+  geom_histogram(aes(x = Wr.Hnd), bins = 10, fill = resolve_pal_colour("grey2")) 
+
+survey %>% 
+  filter(!is.na(Wr.Hnd)) %>% 
+  ggplot() +
+  geom_histogram(aes(x = Wr.Hnd), bins = 10, fill = resolve_pal_colour("grey2")) + 
+  facet_wrap(~Clap)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

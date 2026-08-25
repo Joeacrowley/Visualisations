@@ -1,0 +1,200 @@
+---
+title: "Geom gallery"
+format: html
+editor: visual
+---
+
+A single, basic worked example of each geom on the original "core-ish" list — standalone from the intro chapter, so nothing here depends on objects created there. Worked against `mpg` and `economics`, both built into ggplot2, plus `ggrepel` for the two repel geoms (`install.packages("ggrepel")` if not already installed).
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(ggrepel)
+```
+
+### geom_point
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point()
+```
+
+### geom_line
+
+```{r}
+ggplot(economics, aes(x = date, y = unemploy)) +
+  geom_line()
+```
+
+### geom_col / geom_bar
+
+`geom_bar` counts raw rows for you (stat `"count"`); `geom_col` plots a value you've already computed (stat `"identity"`).
+
+```{r}
+ggplot(mpg, aes(x = class)) +
+  geom_bar(fill = "steelblue", colour = "black")
+
+mpg_class <- mpg %>% count(class)
+
+ggplot(mpg_class, aes(x = class, y = n)) +
+  geom_col(fill = "steelblue", colour = "black")
+```
+
+### Grouped bar chart
+
+`position = "dodge"` — one bar per drivetrain, side by side within each class. Flipped horizontal here (`coord_flip()`), which is the usual fix once category labels get too long to sit legibly on the x axis.
+
+```{r}
+mpg_class_drv <- mpg %>% count(class, drv)
+
+ggplot(mpg_class_drv, aes(x = class, y = n, fill = drv)) +
+  geom_col(position = "dodge") +
+  coord_flip()
+```
+
+### Stacked bar chart
+
+`position = "stack"` — ggplot's default for `geom_col`/`geom_bar` when `fill` is mapped, so it doesn't need to be stated explicitly. Same data as the grouped chart above, segments stacked into one bar per class instead of sitting side by side.
+
+```{r}
+ggplot(mpg_class_drv, aes(x = class, y = n, fill = drv)) +
+  geom_col()
+```
+
+### geom_histogram
+
+```{r}
+ggplot(mpg, aes(x = hwy)) +
+  geom_histogram(binwidth = 2, fill = "steelblue", colour = "black")
+```
+
+### geom_density
+
+```{r}
+ggplot(mpg, aes(x = hwy)) +
+  geom_density(fill = "steelblue", alpha = 0.5)
+```
+
+### geom_boxplot
+
+```{r}
+ggplot(mpg, aes(x = class, y = hwy)) +
+  geom_boxplot() 
+```
+
+<br> 
+With an overlay...
+```{r}
+ggplot(mpg, aes(x = class, y = hwy)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.2, alpha = 0.2, colour = "blue")
+```
+
+### geom_violin
+
+Same shape of comparison as the boxplot above, but shows the full distribution shape rather than just the five-number summary.
+
+```{r}
+ggplot(mpg, aes(x = class, y = hwy)) +
+  geom_violin() 
+```
+
+### geom_jitter
+
+`cty` vs a discrete x — plain points would stack exactly on top of each other; jitter adds a small amount of random noise so overlapping observations are visible.
+
+```{r}
+ggplot(mpg, aes(x = class, y = cty)) +
+  geom_jitter(width = 0.2, alpha = 0.5)
+```
+
+### geom_smooth
+
+A fitted trend line with its confidence ribbon, layered over the raw points.
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm")
+```
+
+### geom_errorbar / geom_pointrange
+
+Uncertainty around a point estimate — here, mean `hwy` by class ± 1 standard error.
+
+```{r}
+mpg_summary <- mpg %>%
+  group_by(class) %>%
+  summarise(mean_hwy = mean(hwy), se_hwy = sd(hwy) / sqrt(n()))
+
+ggplot(mpg_summary, aes(x = class, y = mean_hwy)) +
+  geom_errorbar(aes(ymin = mean_hwy - se_hwy, ymax = mean_hwy + se_hwy), width = 0.2) +
+  geom_point()
+
+# geom_pointrange does the same thing in a single geom
+ggplot(mpg_summary, aes(x = class, y = mean_hwy)) +
+  geom_pointrange(aes(ymin = mean_hwy - se_hwy, ymax = mean_hwy + se_hwy))
+```
+
+### geom_area / geom_ribbon
+
+`geom_area` fills the space under a single line; `geom_ribbon` fills the space between two values (`ymin`/`ymax`) — here an illustrative ±10% band around the same series.
+
+```{r}
+ggplot(economics, aes(x = date, y = unemploy)) +
+  geom_area(fill = "steelblue", alpha = 0.6)
+
+ggplot(economics, aes(x = date)) +
+  geom_ribbon(aes(ymin = unemploy * 0.9, ymax = unemploy * 1.1), fill = "steelblue", alpha = 0.3) +
+  geom_line(aes(y = unemploy))
+```
+
+### geom_text / geom_label
+
+Value labels placed directly on a chart — `geom_label` adds a background box, `geom_text` doesn't.
+
+```{r}
+ggplot(mpg_class, aes(x = class, y = n)) +
+  geom_col(fill = "steelblue", colour = "black") +
+  geom_text(aes(label = n), vjust = -0.3)
+
+ggplot(mpg_class, aes(x = class, y = n)) +
+  geom_col(fill = "steelblue", colour = "black") +
+  geom_label(aes(label = n), vjust = -0.3)
+```
+
+
+### geom_text_repel / geom_label_repel (ggrepel)
+
+Plain `geom_text` on a scatter plot produces overlapping, unreadable labels. `ggrepel`'s versions nudge labels apart automatically while keeping a leader line back to the point.
+
+```{r}
+mpg_class_means <- mpg %>%
+  group_by(class) %>%
+  summarise(displ = mean(displ), hwy = mean(hwy))
+
+ggplot(mpg_class_means, aes(x = displ, y = hwy, label = class)) +
+  geom_point() +
+  geom_text_repel()
+```
+
+
+### geom_tile
+
+The actual case for reaching for this: a correlation matrix. A table of numbers is slow to scan for pattern; colour lets your eye pick out the strong relationships immediately, and overlaying the coefficient keeps the precision a table gives you. Same logic applies to any variable-by-variable or category-by-category grid — cross-tab percentages, a similarity matrix, a confusion matrix.
+
+```{r}
+mtcars_cor <- mtcars %>%
+  select(mpg, disp, hp, drat, wt, qsec) %>%
+  cor() %>%
+  as.data.frame() %>%
+  rownames_to_column("var1") %>%
+  pivot_longer(-var1, names_to = "var2", values_to = "correlation")
+
+ggplot(mtcars_cor, aes(x = var1, y = var2, fill = correlation)) +
+  geom_tile() +
+  geom_text(aes(label = round(correlation, 2)), size = 3) +
+  scale_fill_gradient2(low = "steelblue", mid = "white", high = "firebrick", midpoint = 0) +
+  labs(x = NULL, y = NULL)
+```
+

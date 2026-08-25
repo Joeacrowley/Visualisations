@@ -1,0 +1,30 @@
+Package: visu
+Title: House ggplot2 Theme, NC Colour Palette, and Chart-Building Functions
+Version: 0.1.0
+Authors@R:
+    person("Joe", "Crowley", email = "joeac121@gmail.com", role = c("aut", "cre"))
+Description: A consistent ggplot2 house theme (theme_house()); a work-
+    compatible five-family tint-ramp colour palette (nc_alt1) with matching
+    scale_*_pal_*() categorical, sequential, gradient, and diverging scale
+    functions; and calc_stats()-aware bar chart builders (bar(),
+    bar_clustered(), bar_stacked()) for upright, clustered, and stacked bar
+    charts with automatic label wrapping, orientation flipping, and value-
+    label placement. finalise_plot() gives every exported chart consistent
+    export dimensions.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 4.1.0)
+Imports:
+    ggplot2,
+    dplyr,
+    purrr,
+    stringr,
+    forcats,
+    rlang,
+    grDevices
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

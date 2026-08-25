@@ -1,0 +1,127 @@
+---
+title: "Work-alternative colour palette"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(scales)
+library(visu)
+```
+
+`nc_alt1` (from the `visu` package - see `visu/R/nc_alt1.R`) is a work-compatible alternative colour palette - five colour families plus a standalone grey, matching the shape of the real work brand palette, so it can be swapped in for it directly. Not the same object as `house_colours` (this project's own six-family personal palette) - see `visu/R/nc_alt1.R`'s own header for the full design rationale.
+
+```{r}
+nc_alt1
+scales::show_col(unlist(nc_alt1), ncol = 5)
+```
+
+## The comparable scale functions
+
+Same function set as `house_colours.R`'s (`_pal` instead of `_house`), same examples as `6_house_palette.qmd`'s equivalents, one each.
+
+### scale_fill_pal_categorical()
+
+For an unordered categorical variable - each level just needs to read as visually distinct from the others, with no implied sequence between them. Draws one colour per family, spreading across hues before repeating within one, same logic as `scale_fill_house_categorical()`. Grey is a selectable family here (unlike in `house_colours`), so with enough categories it can turn up as one of the fill colours, not just as a neutral extra.
+
+```{r}
+ggplot(mpg, aes(x = class, fill = as_factor(drv))) +
+  geom_bar() +
+  scale_fill_pal_categorical(n = 4, primary = 4)
+```
+
+### scale_colour_pal_categorical()
+
+Same as `scale_fill_pal_categorical()`, for point/line colour rather than fill - typically a scatterplot with an unordered grouping variable.
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour = as_factor(drv))) +
+  geom_point(size = 2) +
+  scale_colour_pal_categorical(n = 4, primary = 1, families = c("blue", "pink", "purple"))
+```
+
+### scale_fill_pal_sequential()
+
+For levels that all belong to *one* colour family rather than being spread across several - e.g. sub-categories of a single concept, where staying within one hue (varying only tint) signals they're related, rather than distinct topics.
+
+Also the natural fit for an ordered/ranked categorical variable (e.g. a Likert scale, or `diamonds$cut`'s Fair-to-Ideal ordering) - a single hue's tint ramp read low to high, so the direction of the order is visible in the colour itself, not just the legend order.
+
+Up to 5 levels, it pulls the family's 5 discrete shades; past 5 it switches to interpolating continuously between them instead - a family only has 5 real shades to give, so beyond that a discrete tier just isn't available.
+
+```{r}
+ggplot(mpg, aes(x = class, fill = drv)) +
+  geom_bar() +
+  scale_fill_pal_sequential(family = "orange", n = 3)
+```
+
+`diamonds$clarity` has 8 ordered levels - past the 5 discrete shades, so this draws on the interpolated branch instead.
+
+```{r}
+diamonds_clarity_counts <- diamonds %>% count(clarity)
+
+ggplot(diamonds_clarity_counts, aes(x = clarity, y = n, fill = clarity)) +
+  geom_col() +
+  scale_fill_pal_sequential(family = "orange", n = 8)
+```
+
+### scale_colour_pal_sequential()
+
+Same as `scale_fill_pal_sequential()`, for point/line colour.
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour = drv)) +
+  geom_point(size = 2) +
+  scale_colour_pal_sequential(family = "blue", n = 3)
+```
+
+### scale_fill_pal_gradient()
+
+For continuous numeric data with no meaningful midpoint - a single low-to-high colour ramp, e.g. a raw rate or count mapped onto a map or heatmap.
+
+```{r}
+#| message: false
+library(maps)
+
+arrests <- USArrests %>%
+  rownames_to_column("state") %>%
+  mutate(
+    state       = tolower(state),
+    murder_diff = Murder - mean(Murder)
+  )
+
+arrests_map <- map_data("state") %>%
+  left_join(arrests, by = c("region" = "state"))
+
+ggplot(arrests_map, aes(x = long, y = lat, group = group, fill = Murder)) +
+  geom_polygon(colour = "white", linewidth = 0.1) +
+  coord_quickmap() +
+  scale_fill_pal_gradient() +
+  theme_void() +
+  labs(title = "Murder arrests per 100,000 (1973)", fill = "Rate")
+```
+
+`family` defaults to `"pink"` (its previous, only behaviour) but takes any `nc_alt1` family now.
+
+```{r}
+ggplot(arrests_map, aes(x = long, y = lat, group = group, fill = Murder)) +
+  geom_polygon(colour = "white", linewidth = 0.1) +
+  coord_quickmap() +
+  scale_fill_pal_gradient(family = "mint") +
+  theme_void() +
+  labs(title = "Murder arrests per 100,000 (1973)", fill = "Rate")
+```
+
+### scale_fill_pal_diverging()
+
+For continuous numeric data with a meaningful reference point (e.g. zero, or a national average) - two hues diverging in opposite directions from a shared midpoint, so values above and below the reference are immediately distinguishable by colour as well as sign. The one function here that doesn't take `family`/`families` - always pink/mint either side of grey, same as `scale_fill_house_diverging()`.
+
+```{r}
+ggplot(arrests_map, aes(x = long, y = lat, group = group, fill = murder_diff)) +
+  geom_polygon(colour = "white", linewidth = 0.1) +
+  coord_quickmap() +
+  scale_fill_pal_diverging(midpoint = 0) +
+  theme_void() +
+  labs(title = "Murder rate vs. national average (1973)", fill = "Deviation")
+```

@@ -1,0 +1,388 @@
+---
+title: "House colour palette"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(scales)
+
+source("scripts/house_colours.R")
+```
+
+`house_colours` (defined in `scripts/house_colours.R`) is six colour families plus a standalone grey, each a five-step tint ramp — similar in shape to a typical workplace brand-colour template (one base hue per family, tinted from saturated down to pale), but built from independently chosen hues so it stays free of any employer's brand identity, and safe to use on a public repo.
+
+Every family started out generated — one base hex colour fed through a single function, five tints out the other end. Most of them didn't stay that way. Getting each family to actually look like a coherent progression of one colour, rather than a smear from vivid to grey or an odd colour clash between neighbouring swatches, meant a lot of hand correction. This chapter is a record of that: the concepts behind the tuning, and the specific pattern each family ended up on.
+
+## Hue, tint, and saturation
+
+Three knobs sit behind every colour in this palette, in [HSL](https://en.wikipedia.org/wiki/HSL_and_HSV) terms rather than the raw RGB a hex code encodes:
+
+**Hue** is the position on the colour wheel, 0–360°. It answers "is this blue, or green, or orange" — the colour's basic identity. Nudging hue is what turned the original straight orange into gold, and it's the axis a colour family sits on for good: every swatch in a family shares (almost) the same hue.
+
+**Saturation** is how vivid a colour is versus how much grey is mixed in — 100% is the purest, most intense version of a hue; 0% is plain grey with no colour at all. This is the knob that caused the most trouble in this palette: interpolating a colour straight toward white in RGB space desaturates some hues far faster than others, so a "generated" ramp can quietly go grey in the middle before its swatch count says it should.
+
+**Tint** is what happens as **lightness** rises toward white (its opposite, shading, is lightness falling toward black). A five-step tint ramp is a base colour progressively mixed with more and more white. Tint and saturation are easy to conflate — tint necessarily raises lightness, but saturation is a separate axis: two colours can be equally light while one still reads as vivid and the other has gone nearly grey.
+
+## The palette
+
+The object is a named list of length 6, each element containing a vector length 5 with the corresponding hex codes. 
+
+```{r}
+house_colours
+```
+
+<br>
+
+When you unlist this the result is a named vector, with name being a combination of list element name and vector position. So the first value in the element named blue becomes 'blue1'.
+
+```{r}
+unlist(house_colours)
+unlist(house_colours)["blue1"]
+```
+
+```{r}
+scales::show_col(unlist(house_colours)[c("blue1", "gold1", "pink3", 
+                                         "mint3", "purple3", "green2")])
+```
+
+
+```{r}
+scales::show_col(unlist(house_colours), ncol = 5)
+```
+
+## Pattern by family
+
+Bases alternate deep and vivid in character: blue and purple sit deep and dark, pink, mint, gold and green sit bright and punchy. Every ramp is capped short of pure white, so even the palest tint still reads as a faint version of its own colour rather than washing out — and the palest swatch of every colour family (not grey) carries a final +8 point saturation nudge over what the ramp would otherwise give, hue and lightness held fixed. At that lightness the maximum possible chroma is small regardless of saturation, so it reads as a gentle lift rather than a dramatic one.
+
+**Pink, mint and green** share one construction rule. Swatch 1 is the original, untouched base colour — never deepened. Saturation only moves on the swatch5-to-swatch4-to-swatch3 leg, decreasing together with lightness; it then holds flat across swatch3-to-swatch2-to-swatch1, so those three darkest swatches share one saturation and are told apart by lightness alone. That lightness spacing is front-loaded — the widest gap sits between swatch 1 and swatch 2, narrowing toward the pale end — so the flat-saturation trio still reads as clearly distinct steps rather than blurring together.
+
+-   pink (H330): S90 flat across swatches 1-3, L 50→67→80, then S rising to 100 by the palest swatch
+-   mint (H160): S68 flat across swatches 1-3 (12 points below its neighbours' pattern - see note below), L 55→70→81, then S pulled back rather than rising - S61→75 across swatches 4-5, both nudges working against the same near-white ceiling from opposite directions
+-   green (H120): S80 flat across swatches 1-3, L 42→62→76, then tapering (rather than holding flat) through the last two swatches — green shares blue/purple's desaturation problem below, not mint/pink's easier case
+
+**Blue and purple** share a different rule, arrived at after several rejected attempts. Both bases have two low, closely-matched RGB channels that rush toward white together under plain interpolation, desaturating fast (blue's 70% collapses to \~37% by the second swatch if left on the generator; purple's 65% to \~40%). Dipping saturation right after the base to cushion that collapse — the way purple was originally tuned — fixed the desaturation but then read as washed-out grey through the middle swatches. Holding saturation flat and high all the way through instead read as a distinct, vivid accent colour sitting next to the dark base, not a lighter version of it. The version that stuck: swatch 1 stays a deep, saturated anchor (deeper than any other family's base), and swatches 2-5 hold hue and saturation essentially flat while lightness alone carries the rest of the ramp — a bold, consistently-saturated group of four lighter tints sitting below one much darker anchor, closer in spirit to how gold works than to a classic dip.
+
+-   blue (H247): S70 at the base, then a essentially flat S\~74-75 across swatches 2-5, L climbing 30→64→77→91→95
+-   purple (H287-292): S67 at the base, then S\~62-65 across swatches 2-5, L climbing 40→51→69→87→94
+
+**Gold** was left on the plain generator — its base saturation already sits near 100%, so there's no headroom for any of the above corrections to do anything visible. It's the one family that never needed hand-tuning.
+
+**Grey** is also generator-only, saturation 0 throughout by definition — differentiated purely by lightness (L 38→51→64→78→91).
+
+## Note: the original orange
+
+Gold started out as a straight orange (hue 38°) before its hue was rotated +10° to 48° so it read as gold rather than orange — the same generator, same saturation/lightness/boost recipe, just a different starting hue.
+
+```{r}
+original_orange <- c("#F59B00", "#F7B036", "#F9C56B", "#FBDBA3", "#FFF0D8")
+scales::show_col(original_orange, ncol = 5)
+```
+
+Not used anywhere in the current palette, but kept here as a note: this could be reinserted as a seventh family (orange, alongside gold rather than instead of it) or swapped back in for gold if a more literal orange is ever wanted over the current gold.
+
+## Note: a "direct" pure-blue alternative
+
+Blue's base, `#231782`, sits at hue 247° — genuinely indigo, seven degrees into violet territory rather than the pure blue of hue 240°. Several points in blue's tuning explored nudging hue back toward 240° or further, rather than accepting that indigo cast. The version actually in use keeps the original indigo hue throughout and never bends it.
+
+As a note only — not used, and not built out with the same care as the real palette — here's roughly what a "direct" blue would look like anchored on pure blue itself (`#0000FF`, darkened) instead of the original indigo base, built out with the same flat-hue, flat-saturation, lightness-led shape as the real blue family:
+
+```{r}
+direct_blue <- c("#0000B2", "#3E3EEA", "#8484F0", "#C2C2F4", "#EBEBFA")
+scales::show_col(direct_blue, ncol = 5)
+```
+
+## The families on the colour wheel
+
+```{r}
+#| fig.height: 6
+hue_ring <- tibble(hue = seq(0, 359, by = 1)) %>%
+  mutate(ring_colour = hsv(hue / 360, 0.75, 0.95))
+
+family_hues <- tibble(
+  family = c("pink", "mint", "blue", "gold", "purple", "green"),
+  hue    = c(330, 160, 247, 48, 291, 120)
+) %>%
+  mutate(swatch_colour = map_chr(family, ~ house_colours[[.x]][1]))
+
+ggplot() +
+  geom_tile(data = hue_ring, aes(x = hue, y = 1, fill = ring_colour), width = 1, height = 0.5) +
+  scale_fill_identity() +
+  geom_point(data = family_hues, aes(x = hue, y = 1.4, colour = swatch_colour), size = 8) +
+  scale_colour_identity() +
+  geom_text(data = family_hues, aes(x = hue, y = 1.75, label = family), size = 3.5) +
+  coord_polar(theta = "x", start = 0) +
+  ylim(0, 2) +
+  theme_void() +
+  labs(title = "House palette base hues on the colour wheel")
+```
+
+The two largest empty stretches sit between gold (48°) and pink (330°), or gold and green (120°), as well as between mint (160°) and blue (247°), covering cyan/turquoise/azure.
+
+## Each family's progression
+
+The same five-category variable (`diamonds$cut`) filled by each family in turn, first as separate bars, then stacked — the stacked version is the harder test, since it's exactly the situation where neighbouring swatches need to stay distinguishable.
+
+```{r}
+diamonds_clarity_cut <- diamonds %>% count(clarity, cut)
+```
+
+### Separate bars
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$pink) +
+  labs(title = "pink", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$mint) +
+  labs(title = "mint", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$blue) +
+  labs(title = "blue", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$gold) +
+  labs(title = "gold", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$purple) +
+  labs(title = "purple", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$green) +
+  labs(title = "green", fill = "Cut")
+```
+
+### Stacked bars
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$pink) +
+  labs(title = "pink", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$mint) +
+  labs(title = "mint", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$blue) +
+  labs(title = "blue", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$gold) +
+  labs(title = "gold", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$purple) +
+  labs(title = "purple", fill = "Cut")
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$green) +
+  labs(title = "green", fill = "Cut")
+```
+
+## The house scale functions
+
+One example per function, reusing the same datasets and chart shapes as the "Colour scales and palettes" chapter, so each house equivalent sits directly next to what it's standing in for.
+
+### scale_fill_house_categorical()
+
+```{r}
+ggplot(mpg, aes(x = class, fill = as_factor(drv))) +
+  geom_bar() +
+  scale_fill_house_categorical(n = 4, primary = 3)
+```
+
+A stacked bar with 6 fill colours, the harder case since neighbouring bands share a border in the same column:
+
+```{r}
+diamonds_clarity_lumped <- diamonds %>%
+  mutate(clarity_lumped = fct_lump_n(clarity, n = 5)) %>%
+  count(cut, clarity_lumped)
+
+ggplot(diamonds_clarity_lumped, aes(x = cut, y = n, fill = clarity_lumped)) +
+  geom_col(position = "fill") +
+  scale_fill_house_categorical(n = 6, primary = 2) +
+  labs(title = "Stacked bar, 6 categorical fill colours", fill = "Clarity")
+```
+
+`families` lets you prioritise a subset - here just blue and gold, exactly the 6 colours those two families can give (5 tiers each, tier-banded, no spillover needed):
+
+```{r}
+mpg_manufacturer_lumped6 <- mpg %>%
+  mutate(manufacturer_lumped = fct_lump_n(manufacturer, n = 5)) %>%
+  count(manufacturer_lumped)
+
+ggplot(mpg_manufacturer_lumped6, aes(x = manufacturer_lumped, y = n, fill = manufacturer_lumped)) +
+  geom_col() +
+  scale_fill_house_categorical(n = 6, families = c("pink", "mint")) +
+  labs(title = "6 categories, families limited to blue + gold", fill = "Manufacturer")
+```
+
+Ask for more than the selected families can give (11, but blue + gold only stretch to 10) and it spills into the rest of the palette to make up the difference, rather than erroring:
+
+```{r}
+mpg_manufacturer_lumped11 <- mpg %>%
+  mutate(manufacturer_lumped = fct_lump_n(manufacturer, n = 10)) %>%
+  count(manufacturer_lumped)
+
+ggplot(mpg_manufacturer_lumped11, aes(x = manufacturer_lumped, y = n, fill = manufacturer_lumped)) +
+  geom_col() +
+  scale_fill_house_categorical(n = 11, families = c("blue", "gold", "mint")) +
+  labs(title = "11 categories, blue + gold prioritised then topped up", fill = "Manufacturer")
+```
+
+### scale_colour_house_categorical()
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour = as_factor(drv))) +
+  geom_point(size = 2) +
+  scale_colour_house_categorical(n = 4, primary = 1)
+```
+
+### scale_fill_house_sequential()
+
+```{r}
+ggplot(mpg, aes(x = class, fill = drv)) +
+  geom_bar() +
+  scale_fill_house_sequential(family = "gold", n = 3)
+```
+
+### scale_colour_house_sequential()
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, colour = drv)) +
+  geom_point(size = 2) +
+  scale_colour_house_sequential(family = "blue", n = 3)
+```
+
+### scale_fill_house_ordinal()
+
+```{r}
+diamonds_cut_counts <- diamonds %>% count(cut)
+
+ggplot(diamonds_cut_counts, aes(x = cut, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_house_ordinal(n = 5)
+```
+
+### scale_fill_house_gradient()
+
+```{r}
+#| message: false
+library(maps)
+
+arrests <- USArrests %>%
+  rownames_to_column("state") %>%
+  mutate(
+    state       = tolower(state),
+    murder_diff = Murder - mean(Murder)
+  )
+
+arrests_map <- map_data("state") %>%
+  left_join(arrests, by = c("region" = "state"))
+
+ggplot(arrests_map, aes(x = long, y = lat, group = group, fill = Murder)) +
+  geom_polygon(colour = "white", linewidth = 0.1) +
+  coord_quickmap() +
+  scale_fill_house_gradient() +
+  theme_void() +
+  labs(title = "Murder arrests per 100,000 (1973)", fill = "Rate")
+```
+
+### scale_fill_house_diverging()
+
+```{r}
+ggplot(arrests_map, aes(x = long, y = lat, group = group, fill = murder_diff)) +
+  geom_polygon(colour = "white", linewidth = 0.1) +
+  coord_quickmap() +
+  scale_fill_house_diverging(midpoint = 0) +
+  theme_void() +
+  labs(title = "Murder rate vs. national average (1973)", fill = "Deviation")
+```
+
+## Alternative palettes
+
+`alternative_palette()` swaps house_colours for an earlier or externally-sourced starting point rather than the finished, hand-tuned families above - each option returned rather than assigned directly, so the swap is a visible, explicit step (`house_colours <- alternative_palette(...)`) rather than a hidden side effect.
+
+### "desaturate"
+
+```{r}
+house_colours <- alternative_palette("desaturate")
+scales::show_col(unlist(house_colours), ncol = 5)
+
+diamonds_clarity_lumped <- diamonds %>%
+  mutate(clarity_lumped = fct_lump_n(clarity, n = 5)) %>%
+  count(cut, clarity_lumped)
+
+ggplot(diamonds_clarity_lumped, aes(x = cut, y = n, fill = clarity_lumped)) +
+  geom_col(position = "fill") +
+  scale_fill_house_categorical(n = 6, primary = 3) +
+  labs(title = "Stacked bar, 6 categorical fill colours", fill = "Clarity")
+```
+
+### "tailwind"
+
+```{r}
+house_colours <- alternative_palette("tailwind")
+scales::show_col(unlist(house_colours), ncol = 5)
+
+diamonds_clarity_lumped <- diamonds %>%
+  mutate(clarity_lumped = fct_lump_n(clarity, n = 5)) %>%
+  count(cut, clarity_lumped)
+
+ggplot(diamonds_clarity_lumped, aes(x = cut, y = n, fill = clarity_lumped)) +
+  geom_col(position = "fill") +
+  scale_fill_house_categorical(n = 6, primary = 2) +
+  labs(title = "Stacked bar, 6 categorical fill colours", fill = "Clarity")
+```
+
+
+
+```{r}
+ggplot(diamonds_clarity_lumped, aes(x = cut, y = n, fill = clarity_lumped)) +
+  geom_col(position = "fill") +
+  scale_fill_house_categorical(n = 6, primary = 1) +
+  labs(title = "Stacked bar, 6 categorical fill colours", fill = "Clarity")+
+  scale_fill_manual(values = unname(unlist(house_colours)[
+    c("blue1", "gold2", "pink2", "mint2", "purple2", "green2")
+    ]))
+
+```
+

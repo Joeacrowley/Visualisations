@@ -1,0 +1,308 @@
+---
+title: "ggplot intro"
+format: html
+editor: visual
+---
+
+## The layer skeleton
+
+A ggplot call builds up in layers. ggplot doesn't care what order you write them in — `+` just adds elements to the plot object — but writing them in this order mirrors the underlying grammar and keeps calls readable.
+
+```{r}
+#| eval: false
+
+# data + global (inherited) mapping
+ggplot(data = df, mapping = aes(x = xvar, y = yvar)) +   
+  
+  # geom: aes() = mapped, arg = fixed
+  geom_col(aes(fill = grp), colour = "black") +         
+  # stat = "identity" is geom_col's default; 
+  # use geom_bar(stat = "count") to let ggplot tally rows
+
+  # scale: controls how mapped values -> visual controls
+  scale_fill_manual(values = my_palette) +      
+  scale_y_continuous(labels = scales::comma) +
+
+  # coord: alters the coordinate space (e.g. horizontal bars)
+  coord_flip() +                                          
+
+  # facet: splits into small multiples
+  facet_wrap(~ facet_var, scales = "free_y") +             
+
+  labs(title = "Title", x = "X axis", y = "Y axis", fill = "Legend") +
+
+  # theme: non-data styling, best applied last
+  theme_minimal() +                                       
+  theme(legend.position = "bottom")
+```
+
+## Setting aesthetics `aes`
+
+The one conceptual distinction worth keeping straight, since it's the actual source of bugs:
+
+**Mapped vs fixed.**
+
+-   `aes(colour = var)` maps a column to a visual property — it varies row to row.\
+-   `colour = "black"` outside `aes()` sets it to one fixed value for the whole layer.
+
+**Global vs local.**
+
+-   `aes()` supplied inside `ggplot()` is inherited by every geom that follows.\
+-   `aes()` supplied inside a specific `geom_*()` only applies to that layer, and overrides the global mapping for that aesthetic.
+
+<br>
+
+## Presentation vs calculation of statistics
+
+Different ggplot geoms approach this differently. Some calculate new statistics on the data you pass them, others simply plot the data already there.
+
+-   `geom_bar()` uses stat 'count' to count the number of cases in x category,\
+-   `geom_col()` uses stat 'identity'. It plots the values already in `y`; bar height = `y`,\
+-   `geom_boxplot()` does much more, it calculates IQR, median, max and min, and presents them all,\
+-   `geom_histogram()` bins continuous variables and counts the observations per bin.
+
+These are controlled by the `stat` argument, which defines the calculation used.
+
+<br>
+
+## Applied examples
+
+Worked against `mpg` and `economics_long`, both built into ggplot2 — no external data needed to reproduce any of these.
+
+| Concept | Illustrated with |
+|---|---|
+| x / y axis | `geom_point` |
+| Colour vs fill | `geom_col` |
+| Stat: calculated vs pre-supplied | `geom_bar` → `geom_col` → `geom_histogram` |
+| Position adjustments | `geom_col` |
+| Axis reordering | `geom_col` |
+| Continuous vs discrete colours | `geom_point` |
+| Size | `geom_point` |
+| Shape | `geom_point` |
+| Alpha (transparency) | `geom_point` |
+| Linetype | `geom_line` |
+| Group | `geom_line` (+ spaghetti plot) |
+| Data labels | `geom_col` + `geom_text` |
+| Facets | `geom_boxplot` |
+| Overlaying geoms | `geom_boxplot` + `geom_jitter` |
+
+```{r setup}
+#| message: false
+library(tidyverse)
+```
+
+### x / y axis
+
+The two positional aesthetics. Both continuous here. Each point's screen position is read straight off the data.
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point()
+```
+
+### Colour vs fill
+
+`colour` is the outline, `fill` the fill colour.
+
+```{r}
+mpg_class <- mpg %>% count(class)
+
+ggplot(mpg_class, aes(x = class, y = n)) +
+  # fill = bar interior, colour = bar outline — both visible at once
+  geom_col(fill = "steelblue", colour = "black", linewidth = 0.8) +
+  coord_flip()
+```
+
+### Stat: calculated vs pre-supplied
+
+Below we have the same chart, arrived at in two ways.
+
+`geom_bar` takes raw rows and counts them; `geom_col` takes a value that's already been counted.
+
+```{r}
+# geom_bar: raw rows in, ggplot counts them (stat = "count")
+ggplot(mpg, aes(x = class)) +
+  geom_bar(fill = "steelblue", colour = "black")
+```
+
+Here stat is created separately using count(), then presented with geom_col().
+
+```{r}
+# geom_col: pre-aggregated, ggplot just plots n (stat = "identity")
+mpg_class <- mpg %>% count(class)
+ggplot(mpg_class, aes(x = class, y = n)) +
+  geom_col(fill = "steelblue", colour = "black")
+```
+
+There are lots of statistics ggplot can calculate on the back end, for example, a third stat type — `geom_histogram` bins a continuous variable, then counts rows per bin (stat = "bin"):
+
+```{r}
+ggplot(mpg, aes(x = hwy)) +
+  geom_histogram(binwidth = 2, fill = "steelblue", colour = "black")
+```
+
+### Position adjustments
+
+Same grouped data, three ways to arrange the `fill` segments within each bar.
+
+```{r}
+mpg_class_drv <- mpg %>% count(class, drv)
+
+# stack (default): segments sit on top of each other
+ggplot(mpg_class_drv, aes(x = class, y = n, fill = drv)) +
+  geom_col(position = "stack") +
+  coord_flip()
+
+# dodge: segments sit side by side
+ggplot(mpg_class_drv, aes(x = class, y = n, fill = drv)) +
+  geom_col(position = "dodge") +
+  coord_flip()
+
+# fill: stacked and rescaled to proportions (0-1) — good for share-of-total
+ggplot(mpg_class_drv, aes(x = class, y = n, fill = drv)) +
+  geom_col(position = "fill") +
+  coord_flip()
+```
+
+### Axis reordering
+
+Discrete axes default to factor/alphabetical order, which is rarely what you want on a ranked bar chart.
+
+```{r}
+# default: alphabetical
+ggplot(mpg_class, aes(x = class, y = n)) +
+  geom_col() +
+  coord_flip()
+
+# reordered by value
+ggplot(mpg_class, aes(x = fct_reorder(class, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(x = "class")
+```
+
+### Continuous vs discrete colours
+
+Same aesthetic (`colour`), different variable type — the scale and legend change accordingly.
+
+```{r}
+# continuous -> gradient legend
+ggplot(mpg, aes(x = displ, y = hwy, colour = cty)) +
+  geom_point()
+
+# discrete -> key legend
+ggplot(mpg, aes(x = displ, y = hwy, colour = class)) +
+  geom_point()
+```
+
+### Size
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, size = cty)) +
+  geom_point(alpha = 0.6)
+```
+
+### Shape
+
+Discrete only, point geoms only — and unreadable much past 5-6 levels. `drv` has three.
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy, shape = drv)) +
+  geom_point(size = 2)
+```
+
+### Alpha (transparency)
+
+Fixed here rather than mapped — every point equally transparent, which is what you want for overplotting.
+
+Some appear darker here - this is because some points overlap. This is what `alpha` is telling you. 
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(alpha = 0.3, size = 3)
+```
+
+<br>
+
+Here you can see the overlap increasing opacity. 
+
+```{r}
+ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_jitter(alpha = 0.3, size = 3)
+```
+
+### Linetype
+
+```{r}
+econ_subset <- economics_long %>% filter(variable %in% c("psavert", "uempmed"))
+
+ggplot(econ_subset, aes(x = date, y = value01, linetype = variable)) +
+  geom_line()
+```
+
+### Group
+
+The classic bug: with no colour or group mapping, ggplot draws one line straight through every row in row order not one line per series.
+
+```{r}
+# broken: one zigzag line through all five series
+ggplot(economics_long, aes(x = date, y = value01)) +
+  geom_line()
+
+# fixed: group (or colour) tells ggplot to draw one line per series
+ggplot(economics_long, aes(x = date, y = value01, group = variable)) +
+  geom_line()
+```
+
+**Spaghetti plot — many individual trajectories, no colour.** The standard diagnostic for repeated-measures/panel data before fitting a mixed model: one line per respondent, `group = id`, deliberately not mapped to colour (colouring 30+ respondents just produces an unreadable legend).
+
+```{r}
+set.seed(1)
+panel_data <- tibble(
+  id   = rep(1:30, each = 5),
+  wave = rep(1:5, times = 30)
+) %>%
+  group_by(id) %>%
+  mutate(score = 50 + (wave - 1) * rnorm(1, 2, 1) + rnorm(1, 0, 8) + rnorm(5, 0, 4)) %>%
+  ungroup()
+
+ggplot(panel_data, aes(x = wave, y = score, group = id)) +
+  geom_line(alpha = 0.3)
+```
+
+### Data labels
+
+Putting the value directly on the chart — `geom_text()` (or `geom_label()` for a background box) layered on top of another geom.
+
+```{r}
+ggplot(mpg_class, aes(x = class, y = n)) +
+  geom_col(fill = "steelblue", colour = "black") +
+  geom_text(aes(label = n), vjust = -0.3) +
+  coord_cartesian(clip = "off")
+```
+
+Labelling individual scatter points is a different problem — points overlap, so a bare `geom_text()` produces unreadable clutter. The standard fix is the `ggrepel` package (`geom_text_repel()` / `geom_label_repel()`), which nudges overlapping labels apart automatically. Not demonstrated here since it needs an extra package, but it's the first thing to reach for the moment point labels overlap.
+
+### Facets
+
+```{r}
+# facet_wrap: one variable, wrapped into a grid
+ggplot(mpg, aes(x = class, y = hwy)) +
+  geom_boxplot() +
+  facet_wrap(~ drv)
+
+# facet_grid: two variables, strict rows x columns
+ggplot(mpg, aes(x = class, y = hwy)) +
+  geom_boxplot() +
+  facet_grid(drv ~ year)
+```
+
+### Overlaying geoms
+
+Layers stack — nothing stops you combining two geoms on the same data to get the benefit of both. Here, the boxplot's summary shape plus every individual observation from `geom_jitter`. `outlier.shape = NA` turns off the boxplot's own outlier points so they don't get drawn twice (once by the boxplot, once by jitter).
+
+```{r}
+ggplot(mpg, aes(x = class, y = hwy)) +
+  geom_boxplot(outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.3, colour = "blue")
+```

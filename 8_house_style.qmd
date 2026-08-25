@@ -1,0 +1,214 @@
+---
+title: "House-style building blocks"
+format: html
+editor: visual
+---
+
+Once a `theme()` pass or a `ggsave()` call gets repeated across charts, it's worth pulling out into a function rather than copy-pasting the block each time. `theme_house()` and `finalise_plot()` now live in the `visu` package (see BBC's [bbplot](https://github.com/bbc/bbplot) for the package version of the same idea this was modelled on: `bbc_style()` + `finalise_plot()`).
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(scales)
+library(visu)
+
+source("My own colour palette/house_colours.R")
+```
+
+### theme_house()
+
+A house theme standing in for a manual `theme()` pass: consistent title/subtitle/caption sizing, left-aligned title, bottom legend, minor gridlines dropped. No arguments needed beyond an optional `base_size`.
+
+```{r}
+ggplot(mpg, aes(x = class, fill = drv)) +
+  geom_bar() +
+  labs(title = "Vehicles by class and drivetrain", fill = "Drivetrain") +
+  theme_house()
+```
+
+### Applying it to a finished example
+
+Reusing the `diamonds` cut-by-clarity chart built up stage by stage in the layering chapter — same data prep, same geoms/scales/coord/facet, `theme_house()` standing in for the manual 8a–8c theme pass.
+
+```{r}
+diamonds_summary <- diamonds %>%
+  count(clarity, cut, color) %>%
+  mutate(
+    clarity = fct_recode(clarity, "I1 (worst)" = "I1", "IF (best)" = "IF"),
+    color   = fct_recode(color,   "D (best)" = "D",   "J (worst)" = "J")
+  )
+
+cut_palette <- c(
+  "Fair"      = "#b2182b",
+  "Good"      = "#ef8a62",
+  "Very Good" = "#fddbc7",
+  "Premium"   = "#67a9cf",
+  "Ideal"     = "#2166ac"
+)
+
+plot_house <- ggplot(diamonds_summary, aes(x = clarity, y = n, fill = cut)) +
+  geom_col(position = "fill") +
+  scale_fill_manual(values = cut_palette) +
+  scale_y_continuous(labels = percent) +
+  coord_flip() +
+  facet_wrap(~ color, scales = "free_x") +
+  labs(
+    title = "Cut composition by clarity, faceted by colour grade",
+    x     = "Clarity",
+    y     = "Share of diamonds",
+    fill  = "Cut"
+  ) 
+
+plot_house
+
+```
+
+```{r}
+plot_house <- plot_house +  theme_house()
+
+plot_house
+```
+
+### finalise_plot()
+
+A thin `ggsave()` wrapper — fixes width/height/dpi in one place so every exported chart is sized consistently, rather than repeating those arguments at every call site.
+
+```{r}
+#| eval: true
+finalise_plot(plot_house, "figures/diamonds_cut_by_clarity.png")
+```
+
+### house_colours
+
+Five colour families plus a standalone grey, each a five-step tint ramp (saturated → pale) generated from one base hue via `make_tint_ramp()` — same shape as a typical workplace brand-colour template (one base hue per family, tinted down), built from independently chosen hues rather than reproducing one directly.
+
+```{r}
+scales::show_col(unlist(house_colours), ncol = 5)
+```
+
+Bases alternate deep and vivid in character: blue and purple sit deep and dark, pink, mint and gold sit bright and punchy — and every ramp is capped at 85% of the way to white, so even the palest tint still reads as a faint version of its own colour rather than washing out.
+
+Each family applied to the same five-category variable (`diamonds$cut`), so the six are directly comparable side by side.
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$pink) +
+  labs(title = "pink", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$mint) +
+  labs(title = "mint", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$blue) +
+  labs(title = "blue", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$gold) +
+  labs(title = "gold", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$purple) +
+  labs(title = "purple", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds, aes(x = cut, fill = cut)) +
+  geom_bar() +
+  scale_fill_manual(values = house_colours$green) +
+  labs(title = "green", fill = "Cut") +
+  theme_house()
+```
+
+A stacked bar check as well — all five `cut` tints sitting inside the same bar, adjacent to each other, rather than as separate bars. This is a harder test of legibility than the plots above: it's exactly the situation the palest/darkest swatch pairs need to survive.
+
+```{r}
+diamonds_clarity_cut <- diamonds %>% count(clarity, cut)
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$pink) +
+  labs(title = "pink", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$mint) +
+  labs(title = "mint", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$blue) +
+  labs(title = "blue", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$gold) +
+  labs(title = "gold", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$purple) +
+  labs(title = "purple", fill = "Cut") +
+  theme_house()
+```
+
+```{r}
+ggplot(diamonds_clarity_cut, aes(x = clarity, y = n, fill = cut)) +
+  geom_col() +
+  scale_fill_manual(values = house_colours$green) +
+  labs(title = "green", fill = "Cut") +
+  theme_house()
+```
+
+### scale_fill_house_sequential() / scale_colour_house_sequential()
+
+Same mechanism as `scale_fill_manual()`, with a named ramp from `house_colours` swapped in — `family` picks the family, `n` trims it to however many levels the variable actually has. See `6_house_palette.qmd`'s "The house scale functions" for the fuller set (`give_categorical_colours()`, `give_sequential_colours()`, and the `scale_*_house_*()` wrappers built on them).
+
+```{r}
+ggplot(mpg, aes(x = class, fill = drv)) +
+  geom_bar() +
+  scale_fill_house_sequential(family = "blue", n = 3)
+```
+
+Grey isn't one of the selectable families here (`give_sequential_colours()`/`give_categorical_colours()` both exclude it) - for a "highlight one category, mute the rest" chart, build the fill vector by hand instead, e.g. `c(house_colours$grey[3], house_colours$grey[3], house_colours$pink[1])`, one entry per level.
+
+```{r}
+mpg_class_drv <- mpg %>% count(class, drv)
+
+ggplot(mpg_class_drv, aes(x = class, y = n, fill = drv)) +
+  geom_col() +
+  scale_fill_manual(values = c("4" = house_colours$grey[2], "f" = house_colours$pink[1], "r" = house_colours$grey[2])) +
+  coord_flip()
+```

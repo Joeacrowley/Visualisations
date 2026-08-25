@@ -1,0 +1,29 @@
+project:
+  type: book
+
+book:
+  title: "Visualisations in R"
+  author: "JC"
+  chapters:
+    - index.qmd
+    - part: "ggplot"
+      chapters:
+        - 1_ggplot_intro.qmd
+        - 2_geom_gallery.qmd
+        - 3_ggplot_layering.qmd
+        - 4_ggplot_theme.qmd
+        - 5_ggplot_colour.qmd
+        - 7_nc_palette.qmd
+        - 8_house_style.qmd
+        - 9_basic_bar_charts.qmd
+        - 10_clustered_bar_charts.qmd
+        - 11_stacked_bar_charts.qmd
+        - 12_applied_simple_bars.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 4
+    page-layout: full
+    css: dense-notes.css

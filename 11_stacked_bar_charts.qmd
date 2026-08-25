@@ -1,0 +1,109 @@
+---
+title: "Stacked bar charts"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| message: false
+library(tidyverse)
+library(visu)
+```
+
+### How bar_stacked() works
+
+Same two-variable shape as `bar_clustered()`, but stacks segments into one bar per `x` category (`position = "stack"`) instead of placing them side by side — suited to more `x` categories, or where the total across `fill` levels matters as much as each individual segment.
+
+-   `dat` — the data frame, one row per x/fill combination
+-   `x` — unquoted column name for the axis grouping
+-   `y` — unquoted column name for the already-computed value each bar shows
+-   `fill` — unquoted column name for the stacked colour grouping
+-   `x_lab` / `y_lab` / `fill_lab` — optional axis/legend titles
+-   `title` — optional plot title
+-   `base_size` — base font size, via `theme_house()`
+-   `horiz` — `TRUE` (default, matching this function's original always-flipped behaviour) for horizontal bars, `FALSE` for upright - done by swapping which column maps to the x/y aesthetic, not `coord_flip()` (see `9_basic_bar_charts.qmd`)
+-   `label_digits` — decimal places on each segment's value label, default 1
+-   `label_size` — font size for value labels, default `NULL` (falls back to `base_size`), independent of it
+-   `label_style` — `"normal"` (default), `"suppress"` (no value labels), or `"diag"` (labels at 45 degrees)
+-   `fill_family` — `NULL` (default) colours `fill` categorically, spread across `nc_alt1` families (`scale_fill_pal_categorical()`); set to a family name (e.g. `"mint"`) to colour it sequentially within that one family instead (`scale_fill_pal_sequential()`) - suited to an ordered `fill` variable, no cap on levels
+-   `legend_position` — `"bottom"` (default) or `"right"`
+-   `plot_width` / `plot_height` — feed label-wrapping maths only, not the plot's actual rendered size (see `9_basic_bar_charts.qmd` for the fuller explanation)
+
+Same `clarity`/`cut` data as `6_house_palette.qmd`'s stacked bar check — flagged there as the harder legibility test, since neighbouring swatches sit right next to each other inside one bar. Also a better fit for `bar_stacked()` than a smaller grouping: 8 `clarity` levels justify the horizontal flip.
+
+```{r}
+diamonds_clarity_cut <- diamonds %>% count(clarity, cut)
+
+bar_stacked(diamonds_clarity_cut, clarity, n, cut, title = "Diamonds by clarity and cut", fill_lab = "Cut")
+```
+
+### label_digits, label_size, label_style
+
+Same three label arguments as `bar()`/`bar_clustered()`. `n` is a whole-number count, so `label_digits = 0` drops the wasted ".0"; stacked segments are usually roomier than dodged bars, but the same `label_size`/`"suppress"` options are there if a particular chart gets tight.
+
+```{r}
+bar_stacked(diamonds_clarity_cut, clarity, n, cut, title = "Diamonds by clarity and cut", fill_lab = "Cut", label_style = "suppress")
+```
+
+### fill_family
+
+`cut` is itself ordered (Fair worst through Ideal best), so a one-hue sequential ramp carries that ordering in the colour rather than spreading across families the way the categorical default does.
+
+```{r}
+bar_stacked(diamonds_clarity_cut, clarity, n, cut, title = "Diamonds by clarity and cut", fill_lab = "Cut", fill_family = "mint")
+```
+
+### horiz = FALSE
+
+Previously impossible - `bar_stacked()` always flipped via a hardcoded `coord_flip()`. Now it's just the default being overridden, for an upright stacked bar instead.
+
+```{r}
+bar_stacked(diamonds_clarity_cut, clarity, n, cut, title = "Diamonds by clarity and cut", fill_lab = "Cut", 
+            horiz = FALSE, label_style = "suppress")
+```
+
+`label_style = "diag"` on the same upright chart - rotates the segment labels 45 degrees.
+
+```{r}
+bar_stacked(diamonds_clarity_cut, clarity, n, cut, title = "Diamonds by clarity and cut", fill_lab = "Cut", horiz = FALSE, label_digits = 0, label_style = "diag")
+```
+
+<br>
+
+```{r}
+diamonds %>% count(cut, color) %>% group_by(cut) %>%
+  mutate(p = n / sum(n) * 100) %>%
+  bar_stacked(cut, p, color, y_lab = "Colour (%)", x_lab = "Cut quality", 
+              title = "Colour by cut quality") 
+
+```
+
+<br> 
+
+```{r}
+
+diamonds %>% mutate(
+  price2 = cut(price, breaks = 5, 
+               labels = c("326-4,025","4,026-7,724","7,725-11,422","11,427-15,122","15,124-18,823"))) %>% 
+  # group_by(price2) %>% summarise(min = min(price), max = max(price))
+  count(cut, price2) %>% group_by(cut) %>% mutate(cut = fct_rev(cut)) %>%
+  mutate(p = n / sum(n) * 100) %>% 
+  # select(-n) %>% pivot_wider(values_from = p, names_from = price2)
+  bar_stacked(x = cut, y = p, fill = price2, label_style = "suppress", fill_family = "orange")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
