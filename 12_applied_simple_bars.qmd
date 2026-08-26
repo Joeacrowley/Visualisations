@@ -299,9 +299,9 @@ bar_battery <- function(outcomes, data, statistics = c("perc"), # Can be "count"
 
   plt <- bar_stacked(
     dat       = dat,
-    x         = o_lab,
+    x         = o_lab, # this
     y         = estimate,
-    fill = o_cat,
+    fill = o_cat, # this
     y_lab     = ifelse(statistics %in% "perc", "%", "Count"),
     title     = title, 
     fill_family  = fill_family,
@@ -340,7 +340,7 @@ bar_by <- function(
     outcome, 
     predictor = NULL, 
     cluster = F,
-    statistics = c("perc"), # Can be "count"
+    statistics = c("perc"), # Can be "count", "mean", or "median"
     title = NULL, 
     horiz = F, 
     palette = NULL,
@@ -349,9 +349,22 @@ bar_by <- function(
     ) {
   
   stopifnot(length(statistics) == 1)
+  if(!is.null(predictor)){stopifnot(length(predictor) == 1)}
   
+  true_if_outcome_numeric <- data %>% select(all_of(outcome)) %>% map_lgl(., is.numeric) 
+
+  if(any(true_if_outcome_numeric) & any(statistics %in% c("count", "perc"))){
+    rlang::abort("Numeric outcomes requested with categorical statistics")
+  }
+  
+  if(!any(true_if_outcome_numeric) & any(statistics %in% c("mean", "median"))){
+    rlang::abort("Non-numeric outcomes requested with numeric statistics")
+  }
+
   if(statistics %in% c("mean", "median")){
     chart_type = "num"} else {chart_type = "cat"}
+  
+  out_num <- length(outcome)
   
   fill_arg <- "pink"
   
@@ -365,32 +378,54 @@ bar_by <- function(
   
   if(chart_type == "num" & is.null(predictor)){
     
+    chart_type_2 <- list("Numeric chart, no predictor" = "Type 1")
     chart_func <- bar
     x_arg <- sym("o_lab")
     x_lab_arg = x_lab
 
-  } else if (chart_type == "cat" & is.null(predictor)){
+  } else if (chart_type == "cat" & is.null(predictor) & out_num == 1){
     
+    chart_type_2 <- list("Categorical chart, no predictor" = "Type 2")
     chart_func <- bar
     x_arg <- sym("o_cat")
     x_lab_arg <- dat$o_lab[1]
+    
   
   } else if (chart_type == "num" & !is.null(predictor)){
     
+    chart_type_2 <- list("Numeric chart, one predictor" = "Type 3")
     chart_func <- bar
-  
+    
+  }  else if(chart_type == "cat" & is.null(predictor) & out_num > 1){
+    
+    
+    chart_type_2 <- list("Multiple categorical outcomes, no predictor" = "Type 4")
+    chart_func <- bar_stacked
+    x_arg <- sym("o_lab")
+    fill_arg <- sym("o_cat")
+    x_lab_arg <- x_lab
+
   } else if (chart_type == "cat" & !is.null(predictor) & cluster == F){
     
+    chart_type_2 <- list("One categorical outcome, one predictor (stack)" = "Type 5")
     chart_func <- bar_stacked
     fill_arg <- sym("o_cat")
 
-  } else {chart_func <- bar_clustered}
+  } else {
+    
+    chart_type_2 <- list("One categorical outcome, one predictor (cluster)" = "Type 6")
+    chart_func <- bar_clustered
+    
+    }
     
   if(!is.null(predictor)){
     x_arg <- sym("p_cat1")
     x_lab_arg <- dat$p_lab1 %>% grep("Total", ., value = T, invert = T) %>% unique()
     fill_arg <- sym("o_cat")
   }
+    
+  number_of_outcomes_wrong <- out_num > 1 & !chart_type_2 %in% c("Type 1", "Type 4")
+  if(number_of_outcomes_wrong){rlang::abort("Wrong number of outcomes requested for chart")}
     
   if(is.null(palette) & identical(chart_func, bar)){palette <- "pink"} 
   
@@ -416,10 +451,25 @@ bar_by(
   outcome = "Smoke"
 )
 
+# error 1 - more than one statistic requested
+bar_by(
+  data = survey, 
+  outcome = "Smoke", 
+  statistics = c("count", "mean")
+)
+
 bar_by(
   data = survey, 
   outcome = "Smoke", 
   predictor = "Sex", 
+  horiz = T
+)
+
+# error 2 - more than one predictor requested
+bar_by(
+  data = survey, 
+  outcome = "Smoke", 
+  predictor = c("Sex", "W.Hnd"), 
   horiz = T
 )
 
@@ -442,4 +492,10 @@ bar_by(
   title = "title?"
 )
 
+bar_by(outcome = c("Exer", "Smoke2"), data = survey, horiz=T)
+
+bar_by(outcome = c("Exer", "Smoke2"), data = survey, horiz=T, 
+       statistics = "mean")
+
+  
 ```
